@@ -1074,8 +1074,7 @@ journey
 
 #### ⑤ AI 챗봇 — 우심이에게 물어보기
 
-<!-- TODO: 챗봇 화면 캡처 추가 → docs/images/07-chatbot.png -->
-![AI 운동 코치 우심이 화면](docs/images/07-chatbot.png)
+![AI 운동 코치 우심이 화면](docs/images/ai-coach-usimi.png)
 
 #### ⑥ 운동 기록 — 기록하면 방이 채워진다
 
