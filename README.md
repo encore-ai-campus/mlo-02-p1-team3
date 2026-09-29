@@ -1,839 +1,1114 @@
 <div align="center">
 
-# 🏃 우심운까 · WoosimWoonkka
+# 🏠 우심운까 · WoosimWoonkka
 
-### 오늘도, 움직이는 내가 좋다
+### "우리 심심한데 운동이나 할까?"
 
-<a href="https://hkjfduhalihufsduahufahoiuw.onrender.com/"><img src="https://img.shields.io/badge/Live%20Demo-운동%20시작하기-2f80ed?style=flat-square" alt="Live Demo" height="28" /></a>
-<a href="https://www.djangoproject.com/"><img src="https://img.shields.io/badge/Django-5.2%2B-092e20?style=flat-square&logo=django&logoColor=white" alt="Django" height="28" /></a>
-<a href="https://www.postgresql.org/"><img src="https://img.shields.io/badge/PostgreSQL-PostGIS-336791?style=flat-square&logo=postgresql&logoColor=white" alt="PostgreSQL and PostGIS" height="28" /></a>
-<a href="#1-팀-소개"><img src="https://img.shields.io/badge/Project-MOTIVE-ff8a65?style=flat-square" alt="Project MOTIVE" height="28" /></a>
+**공공데이터 기반 운동 장소 추천 및 운동 습관 기록 서비스**
 
-<p>싸이월드 감성의 운동방과 AI 코치 우심이를 통해<br />오늘 운동하기 좋은 장소를 추천하고 기록을 이어가는 서비스</p>
+날씨·대기질·거리·운영정보로 **오늘 운동하기 좋은 곳**을 추천하고,<br>
+운동 기록으로 **나만의 운동방**을 채워 가는 웹 서비스
+
+[🔗 서비스 바로가기](https://hkjfduhalihufsduahufahoiuw.onrender.com/)
+
+![우심운까 메인 화면 — 나만의 운동방](docs/images/01-home.png)
 
 </div>
 
-![기술 스택 구성](docs/images/tech-stack.png)
-
-우심운까는 싸이월드의 미니룸과 친구 방문에서 착안해, 사용자가 다시 찾아오고 싶은 운동 공간을 만드는 웹 서비스입니다. 지역·날씨·대기질·운동 취향을 연결해 오늘 운동하기 좋은 장소를 추천하고, 운동 후 기록과 운동방 꾸미기로 다음 운동을 이어가게 합니다. 서비스 안의 AI 운동 코치 ‘우심이’는 사용자의 질문에 답하고 추천 결과를 쉽게 설명합니다. 이번 단위 프로젝트에서는 웹 서비스와 분리된 공공데이터 수집·전처리·품질검증·적재·스케줄링 파이프라인을 함께 정리했습니다.
-
-> 발표 전체 메시지: **“다시 찾아가고 싶던 나만의 공간을, 다시 운동하고 싶은 공간으로 만들었습니다.”**
-
-## 웹사이트와 저장소
-
-| 항목 | 주소 |
-| --- | --- |
-| 서비스 URL | [https://hkjfduhalihufsduahufahoiuw.onrender.com/](https://hkjfduhalihufsduahufahoiuw.onrender.com/) |
-| 제출 저장소 | [mlo-02-p1-team3](https://github.com/encore-ai-campus/mlo-02-p1-team3) |
-| 웹 서비스 원본 | [woosimwoonkka-web](https://github.com/2nd-MLOps-engineer/woosimwoonkka-web) |
-| 데이터·백엔드 원본 | [hkjfduhalihufsduahufahoiuw](https://github.com/2nd-MLOps-engineer/hkjfduhalihufsduahufahoiuw) |
-
-> 현재 배포 서비스는 이 저장소가 아닌 별도 배포 설정에서 운영됩니다. 이 저장소는 프로젝트 문서와 평가 설명을 보관합니다.
-
-## 프로젝트 파일 구조
-
-```text
-woosimwoonkka-web/
-├── config/                         # Django 프로젝트 설정·URL·WSGI/ASGI
-├── frontend/                       # 서비스 앱: 화면, 회원, 추천, 운동 기록, 친구 기능
-│   ├── templates/                  # Django HTML 템플릿
-│   ├── static/                     # CSS·JavaScript·이미지 등 정적 파일
-│   ├── migrations/                 # 데이터베이스 스키마 변경 이력
-│   ├── collector.py                # 공공데이터 수집·전처리·품질검증
-│   ├── chatbot_service.py          # AI 운동 코치와 추천 데이터 연결
-│   ├── chatbot_views.py            # AI 챗봇 API 요청·응답 처리
-│   ├── recommendation_service.py   # 운동 장소 추천 로직
-│   ├── models.py                   # 회원·운동·시설 관련 데이터 모델
-│   ├── views.py                    # 웹 화면과 서비스 요청 처리
-│   └── tests.py                    # 서비스 테스트 코드
-├── pipeline/                       # 독립 실행 가능한 데이터 파이프라인
-│   ├── run_pipeline.py             # 수집·전처리·검증·적재 일괄 실행
-│   └── scheduler.py                # 파이프라인 주기 실행 스케줄러
-├── docs/                           # 평가 자료·품질 기준·시연 이미지
-│   ├── assessment/                 # 데이터 품질검증 기준
-│   └── images/                     # 발표용 이미지와 기술 스택 아이콘
-├── manage.py                       # Django 관리 명령 진입점
-├── requirements.txt                # Python 의존성 목록
-├── render.yaml                     # Render 배포 설정
-├── .env.example                    # 환경변수 설정 예시
-├── CRAWLING_AND_RECOMMENDATION.md  # 수집·추천 로직 설명
-└── README.md                       # 프로젝트 소개·실행·평가 문서
-```
-
-### 디렉터리별 역할
-
-| 경로 | 역할 |
-| --- | --- |
-| `config/` | Django 설정, URL 라우팅, 배포용 WSGI/ASGI 구성을 관리합니다. |
-| `frontend/` | 사용자 화면과 회원·추천·운동 기록·친구·AI 운동 코치 기능을 제공하고 서비스 데이터를 처리합니다. |
-| `pipeline/` | 웹 서비스와 분리된 수집·전처리·품질검증·적재·스케줄링을 담당합니다. |
-| `docs/` | 데이터 품질검증 기준, 아키텍처, 데이터 흐름, 시연 화면을 보관합니다. |
-| `manage.py` | 마이그레이션, 서버 실행 등 Django 관리 명령을 실행합니다. |
-| `render.yaml` | 배포 환경의 서비스 실행 명령과 환경 설정을 정의합니다. |
-| `.env.example` | API 키와 데이터베이스 연결 정보에 필요한 환경변수 형식을 안내합니다. |
-
-<table align="center">
-  <tr>
-    <td align="center"><a href="#1-팀-소개">👥<br /><b>팀 소개</b></a></td>
-    <td align="center"><a href="#2-프로젝트-개요">🎯<br /><b>프로젝트</b></a></td>
-    <td align="center"><a href="#3-기술-스택">🧩<br /><b>기술 스택</b></a></td>
-    <td align="center"><a href="#8-수행-결과">🖥️<br /><b>시연 결과</b></a></td>
-    <td align="center"><a href="#9-한-줄-회고">💬<br /><b>회고</b></a></td>
-  </tr>
-</table>
-
-> **작은 움직임이 다음 운동으로 이어지도록** 추천부터 기록, 운동방 꾸미기까지 하나의 흐름으로 연결했습니다.
+> [!TIP]
+> **개발을 몰라도 읽을 수 있게 썼습니다.**
+> 처음 보는 분은 [한눈에 보기](#-한눈에-보기) → [2. 프로젝트 개요](#2-프로젝트-개요) → [8. 시연](#8-3-서비스-시연-페이지) 순서로 읽으면 전체 흐름을 5분 안에 파악할 수 있습니다.
+> 낯선 용어는 [용어 사전](#-용어-사전)에 정리해 두었습니다.
 
 ## 목차
 
-- [1. 팀 소개](#1-팀-소개)
-- [2. 프로젝트 개요](#2-프로젝트-개요)
-- [3. 기술 스택](#3-기술-스택)
-- [4. WBS](#4-wbs)
-- [5. 요구사항 명세서](#5-요구사항-명세서-sr--ur)
-- [6. ERD](#6-erd)
-- [7. 주요 프로시저](#7-주요-프로시저)
-- [8. 수행 결과](#8-수행-결과)
-- [8.1 데이터 엔지니어링 파이프라인 참고](#81-데이터-엔지니어링-파이프라인-참고)
-- [8.2 백엔드 구현·테스트 참고](#82-백엔드-구현테스트-참고)
-- [8.3 실행 방법](#83-실행-방법)
-- [9. 한 줄 회고](#9-한-줄-회고)
+0. [한눈에 보기](#-한눈에-보기)
+1. [팀 소개](#1-팀-소개)
+2. [프로젝트 개요](#2-프로젝트-개요)
+3. [기술 스택](#3-기술-스택)
+4. [WBS](#4-wbs)
+5. [요구사항 명세서](#5-요구사항-명세서)
+6. [ERD](#6-erd)
+7. [주요 프로시저](#7-주요-프로시저)
+8. [수행결과 (테스트·시연 페이지)](#8-수행결과테스트시연-페이지)
+9. [한 줄 회고](#9-한-줄-회고)
+10. [용어 사전](#-용어-사전)
+
+---
+
+## 👀 한눈에 보기
+
+우심운까는 **"어디서 운동하지?"** 라는 고민을 데이터로 풀어 주고, **"운동을 계속할 이유"** 를 게임처럼 만들어 주는 서비스입니다.
+
+```mermaid
+flowchart LR
+    A["👤 프로필 설정<br/>지역 · 선호 운동"] --> B["📍 운동 장소 추천<br/>거리 · 날씨 · 미세먼지"]
+    B --> C["📊 추천 점수·이유 확인<br/>운영·휴무 공지"]
+    C --> D["🏃 운동하고<br/>칼로리 기록"]
+    D --> E["⭐ 레벨업<br/>운동방 아이템 해제"]
+    E --> F["👋 친구 방 방문<br/>🤖 AI 코치 우심이"]
+    F -.다음 날 다시.-> B
+```
+
+| 질문 | 답 |
+|---|---|
+| 무엇을 하나요? | 오늘의 날씨·미세먼지·거리를 따져 운동 장소를 점수로 추천하고, 운동 기록을 레벨과 방 꾸미기 보상으로 바꿔 줍니다. |
+| 데이터는 어디서 오나요? | 공공데이터포털(체육시설·기상청·에어코리아 등), 문화빅데이터 플랫폼, 카카오 지도, 시설 공개 홈페이지 |
+| 데이터는 얼마나 되나요? | 19개 데이터셋 **약 408만 건**을 수집해 정제·품질검증을 거쳐 **약 401만 건**을 데이터베이스에 적재했습니다. |
+| 추천은 AI가 하나요? | 아니요. **팀이 정한 규칙으로 점수를 계산**합니다. (예: 비가 오면 실내 시설 +8점) AI는 대화형 코치 '우심이'에만 쓰입니다. |
+| 누가 만들었나요? | TEAM MOTIVE 4명 (프론트엔드 2 · 데이터 1 · 백엔드 1) |
+
+---
 
 ## 1. 팀 소개
 
-### 팀명
+### 팀명: **MOTIVE**
 
-**MOTIVE**
+> 운동을 **시작할 이유(Motive)** 와 **이어갈 재미**를 함께 만드는 팀
 
-### 팀원
+| <img src="https://github.com/Shinkyeongho.png" width="110" alt="신경호" /> | <img src="https://github.com/callijee22-ship-it.png" width="110" alt="류지예" /> | <img src="https://github.com/baikAnalyst.png" width="110" alt="백선영" /> | <img src="https://github.com/kimhyounjun.png" width="110" alt="김형준" /> |
+| :---: | :---: | :---: | :---: |
+| **신경호** | **류지예** | **백선영** | **김형준** |
+| 프론트엔드 · 발표자료 | 프론트엔드 · 발표자료 | 데이터 수집 · 데이터베이스 파이프라인 | 백엔드 · 프로젝트 전반 |
+| [@Shinkyeongho](https://github.com/Shinkyeongho) | [@callijee22-ship-it](https://github.com/callijee22-ship-it) | [@baikAnalyst](https://github.com/baikAnalyst) | [@kimhyounjun](https://github.com/kimhyounjun) |
 
-<table>
-  <thead>
-    <tr height="48" valign="middle">
-      <th width="14%">팀원</th>
-      <th width="23%">역할</th>
-      <th width="43%">담당 업무</th>
-      <th width="20%">GitHub</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr height="88" valign="middle">
-      <td align="center" nowrap="nowrap"><b>신경호</b></td>
-      <td>프론트엔드 · 발표자료</td>
-      <td>서비스 화면 구현, 사용자 인터페이스 구성, 발표자료 준비</td>
-      <td><a href="https://github.com/Shinkyeongho">Shinkyeongho</a></td>
-    </tr>
-    <tr height="88" valign="middle">
-      <td align="center" nowrap="nowrap"><b>류지예</b></td>
-      <td>프론트엔드 · 발표자료</td>
-      <td>서비스 화면 구현, 사용자 경험 구성, 발표자료 준비</td>
-      <td><a href="https://github.com/callijee22-ship-it">callijee22-ship-it</a></td>
-    </tr>
-    <tr height="88" valign="middle">
-      <td align="center" nowrap="nowrap"><b>백선영</b></td>
-      <td>서비스 기획 · 데이터 엔지니어링</td>
-      <td>서비스 기획, 공공데이터 조사·선정, 데이터 수집·정제·품질검증, PostgreSQL 데이터 파이프라인 구축, 스케줄링·모니터링·알림 자동화</td>
-      <td><a href="https://github.com/baikAnalyst">baikAnalyst</a></td>
-    </tr>
-    <tr height="88" valign="middle">
-      <td align="center" nowrap="nowrap"><b>김형준</b></td>
-      <td>백엔드 · 프로젝트 전반</td>
-      <td>Django 백엔드, 기능 연동, 배포 설정 및 프로젝트 전반</td>
-      <td><a href="https://github.com/kimhyounjun">kimhyounjun</a></td>
-    </tr>
-  </tbody>
-</table>
+| 팀원 | 역할 | 담당 업무 |
+|---|---|---|
+| **신경호** | 프론트엔드 · 발표자료 | 서비스 화면 구현, 사용자 인터페이스 구성, 발표자료 준비 |
+| **류지예** | 프론트엔드 · 발표자료 | 서비스 화면 구현, 사용자 경험 구성, 발표자료 준비 |
+| **백선영** | 데이터 수집 · 데이터베이스 파이프라인 | 공공데이터 수집, 전처리, 품질검증, 데이터 파이프라인 구축 |
+| **김형준** | 백엔드 · 프로젝트 전반 | Django 백엔드, 기능 연동, 배포 설정 및 프로젝트 전반 |
+
+```mermaid
+flowchart LR
+    subgraph FE["🎨 프론트엔드 — 신경호 · 류지예"]
+        FE1["운동방 · 추천 · 친구 · 프로필 화면"]
+    end
+    subgraph BE["⚙️ 백엔드 — 김형준"]
+        BE1["회원 · 추천 API · 운동 기록 · 챗봇 · 배포"]
+    end
+    subgraph DE["🗄️ 데이터 — 백선영"]
+        DE1["수집 · 정제 · 품질검증 · PostgreSQL 적재"]
+    end
+    FE1 <-->|"화면 ↔ API"| BE1
+    BE1 <-->|"추천에 쓸 데이터 조회"| DE1
+```
+
+---
 
 ## 2. 프로젝트 개요
 
-### 프로젝트명
+### 2-1. 프로젝트명
 
 **우심운까: 공공데이터 기반 운동 장소 추천 및 운동 습관 기록 서비스**
 
-### 프로젝트 소개
+### 2-2. 프로젝트 소개 — "여러분의 미니홈피는 어떤 모습이었나요?"
 
-사용자가 지역과 운동 종목을 선택하면 체육시설 정보, 날씨, 대기질을 조합해 운동 장소를 추천합니다. 운동 후에는 칼로리를 기록하고 누적 운동량에 따라 나만의 운동방을 꾸밀 수 있습니다. 친구의 운동방을 방문하고 AI 운동 코치 ‘우심이’에게 오늘 할 운동이나 추천 결과를 물어보며 서비스 안에서 다음 행동을 이어갈 수 있습니다.
+우심운까는 **싸이월드의 미니룸과 친구 방문**에서 착안한 운동 서비스입니다.
+할 일이 없어도 자꾸 들어가 보고 싶었던 '나만의 공간'의 재미를 **운동**과 연결했습니다.
 
-서비스에 필요한 데이터는 다음 흐름으로 다룹니다.
+- 사용자는 자신의 **운동 지역과 선호 운동**을 설정하고, **날씨·대기질·거리·운영정보**를 반영한 운동 장소를 추천받습니다.
+- 운동 후에는 **칼로리를 기록**하고, 누적 운동량에 따라 **레벨업과 운동방 아이템 보상**을 받습니다.
+- **친구 운동방 방문**과 **AI 운동 코치 '우심이'** 를 통해 운동을 계속 이어갈 수 있습니다.
+
+| 🏠 나만의 운동방 | 🏃 오늘의 운동 장소 추천 | 🎁 운동 기록과 보상 | 👋 친구 방문 | 🤖 AI 코치 우심이 |
+|---|---|---|---|---|
+| 캐릭터와 가구를 드래그해 꾸미는 미니룸 | 지역·종목·이동시간 + 날씨·미세먼지로 오늘 갈 곳 추천 | 칼로리를 기록하면 레벨이 오르고 소품·스킨이 열림 | 친구 코드로 친구를 맺고 친구 방에 한마디 | 내 기록과 추천 결과를 바탕으로 운동 상담 |
 
 ```text
-공공데이터 API·웹 공개 정보
-        ↓
-수집기: 원본 응답 보존
-        ↓
-전처리: 필드 표준화·타입 변환
-        ↓
-품질검증: 행 수·식별자·NULL 변화 확인
-        ↓
-PostgreSQL 적재
-        ↓
-Django 추천 API와 화면
+프로필 설정
+→ 운동 장소 추천
+→ 추천 점수·환경정보 확인
+→ 운동 기록
+→ 레벨업·운동방 꾸미기
+→ 친구 방문·AI 코치 활용
 ```
 
-### 프로젝트 필요성(배경)
+> **다시 찾아오고 싶은 공간을 만들고 싶었습니다.**
 
-운동을 시작하려면 주변 시설, 운영시간, 날씨, 대기질을 각각 찾아야 합니다. 데이터가 여러 출처에 흩어져 있고 형식도 달라 수작업으로 관리하면 추천 결과가 오래되거나, 전처리 중 값이 사라져도 발견하기 어렵습니다. 따라서 서비스 기능과 데이터 파이프라인을 분리하고, 원본과 정제 결과를 추적할 수 있는 구조가 필요합니다.
+![싸이월드 미니룸처럼, 다시 들어오고 싶은 운동 공간](docs/images/slides/01-intro.png)
 
-### 공공데이터 활용 필요성
+### 2-3. 프로젝트 필요성(배경) — "그런데 운동하려고 하면 이런 생각이 들죠."
 
-이 프로젝트는 공공데이터를 단순한 참고 자료가 아니라 운동 장소 추천의 핵심 데이터로 활용합니다.
+<div align="center">
 
-사용자가 운동할 장소를 선택하려면 시설 위치뿐 아니라 현재 날씨, 강수 여부, 기온, 풍속, 대기질을 함께 확인해야 합니다. 이러한 정보는 개인이나 서비스 운영자가 직접 수집하기 어렵고, 전국 단위로 지속해서 최신 상태를 유지하기도 어렵습니다.
+**"오늘 비 오는데?"**   **"미세먼지 심하다던데?"**   **"근처에 어디로 가야 할지 모르겠는데?"**
 
-![데이터 활용 배경](docs/images/slides/03-data.png)
+</div>
 
-따라서 데이터 출처를 공공데이터포털과 문화빅데이터 플랫폼으로 나누어 활용했습니다.
+운동을 시작하려고 하면 주변 시설, 날씨, 대기질, 이동시간, 운영 여부를 **각각 다른 앱에서 따로** 확인해야 합니다.
+사용자가 운동을 미루는 대표적인 이유와, 이를 해결하기 위해 우리가 연결한 데이터는 다음과 같습니다.
+
+| 운동을 미루는 이유 | 필요한 데이터 | 출처 | 서비스에서 하는 일 |
+|---|---|---|---|
+| 오늘 비가 오는지 알기 어려움 | 강수·기온·습도·풍속 | 기상청 초단기실황 | 실내·실외 시설 점수 조정 |
+| 미세먼지가 심한지 알기 어려움 | PM10 · PM2.5 | 에어코리아 | 대기질이 나쁘면 실내 시설에 가점 |
+| 주변에 어떤 시설이 있는지 모름 | 시설명·유형·주소·좌표 | 전국체육시설 API, 카카오 로컬 | 가까운 시설 후보 추천 |
+| 이동시간이 얼마나 걸리는지 모름 | 거리, 사용자가 정한 최대 이동시간 | 좌표 계산 + 사용자 입력 | 이동시간 초과 시설 제외 |
+| 시설이 운영 중인지 알기 어려움 | 공개 운영·휴무 안내 | 시설 공개 홈페이지 (크롤링) | 휴무 공지 확인, 감점 |
+| 기록·보상이 없어 지속하기 어려움 | 운동 칼로리 기록 | 사용자 입력 | 레벨업, 운동방 보상, 친구 교류 |
+
+> ⏱️ **이동시간 계산 방식** — 이동시간은 별도의 공공데이터가 아닙니다. 현재는 `거리(km) × 20분`의 도보 기준 추정치로, 실제 길찾기 시간과는 다를 수 있습니다.
+
+![운동을 미루는 이유 = 우리가 모은 데이터](docs/images/slides/03-data.png)
+
+따라서 시설 위치뿐 아니라 **환경정보와 운영정보를 함께 수집**하고, 추천 결과에 반영했습니다.
+또한 이 정보들은 출처마다 형식이 다르고 계속 바뀌기 때문에, 사람이 손으로 모으지 않도록 **원본 보존 → 정제 → 품질검증 → 적재**를 반복하는 **데이터 파이프라인**을 함께 만들었습니다.
+
+### 2-4. 공공데이터 활용 필요성
+
+운동 장소를 제대로 추천하려면 "시설이 어디 있는지"뿐 아니라 "지금 가도 괜찮은지"를 알아야 합니다.
+이 정보는 한 곳에 모여 있지 않아 **여러 공공데이터를 하나로 연결**해야 했습니다.
+
+> **표 읽는 법** — ✅ 수집·적재 + **추천 점수 계산에 직접 사용** · 🗂️ 수집·정제·**DB 적재 완료** (안전·경로·처방 등 참고정보, 추천 점수에는 아직 미반영)
+> 적재 건수는 [8-1. 데이터 처리 결과](#8-1-데이터-처리-결과)의 PROCESSED 적재 기준입니다.
 
 #### 공공데이터포털 데이터
 
-공공데이터포털에서는 실시간 환경 정보, 보조 시설 정보, 안전·이동 정보를 수집해 추천 조건과 데이터 품질검증에 활용했습니다.
+| 데이터 | 활용 내용 | 적재 건수 | 상태 |
+|---|---|---:|:---:|
+| 국민체육진흥공단 전국체육시설 정보 | 시설명·유형·주소·좌표를 이용한 시설 후보 및 거리 계산 | 106,521 | ✅ |
+| 기상청 단기예보·초단기실황 | 기온(T1H)·습도(REH)·강수(PTY·RN1)·풍속(WSD)으로 실내·실외 점수 보정 | 222 | ✅ |
+| 한국환경공단 에어코리아 | PM10·PM2.5로 대기질 판단 | 1,402 | ✅ |
+| 공공체육시설 운영정보 | 시설 운영시간·휴무 등 운영정보 보강 | 7,331 | 🗂️ |
+| 기상특보 | 호우·폭염 등 위험 상황 안내 | 128 | 🗂️ |
+| 공공시설개방 정보 | 이용 가능한 공공 체육시설 보강 | – | 🗂️ |
+| AED 정보 | 시설 주변 안전정보 보강 | 63,626 | 🗂️ |
+| 두루누비 구간·경로 | 걷기·자전거 운동 후보 경로 보강 | 143 | 🗂️ |
+| 자전거 사고다발지역 | 자전거 운동 시 안전 참고정보 | 5,046 | 🗂️ |
 
-| 데이터 | 주요 활용 |
-| --- | --- |
-| 기상청 초단기예보·초단기실황 | 기온·습도·강수·풍속을 확인하고 실내·실외 추천 점수 보정 |
-| 기상특보·기상특보 현황 | 호우·폭염 등 위험 상황을 확인하고 운동 주의 안내 |
-| 에어코리아 대기질 | PM10·PM2.5를 활용해 미세먼지가 높은 날 실내 시설 우선 추천 |
-| AED | 시설 주변 응급 안전정보 보강 및 원본·정제 데이터 품질검증 |
-| 자전거 사고다발지역 | 자전거 운동 후보 지역의 안전 참고정보 |
-| 학교개방 체육시설 | 공공 개방 시설 후보와 운영 가능 시설 보강 |
-| 두루누비 구간·경로 | 걷기·자전거 운동 후보 경로 보강 |
-| 체육시설 인접 대중교통 | 시설 주변 이동·접근성 참고정보. 문화빅데이터 플랫폼 데이터가 아닌 별도 공공데이터로 분류 |
+#### 문화빅데이터 플랫폼 데이터
 
-#### 문화빅데이터 플랫폼 데이터 8종
+| 데이터 | 활용 내용 | 적재 건수 | 상태 |
+|---|---|---:|:---:|
+| 전국공공체육시설 데이터 | 공공 체육시설 위치·유형 기반 추천 | 42,879 | 🗂️ |
+| 공공체육시설 프로그램 정보 | 시설별 운동 종목과 프로그램 제공 | 401,865 | 🗂️ |
+| 체육시설 인접 대중교통 정보 | 시설 주변 접근성 및 이동정보 보완 | 1,639,279 | 🗂️ |
+| 체육시설 안전점검 정보 | 시설 안전점검 결과를 참고정보로 활용 | 182,365 | 🗂️ |
+| 전국체육시설 현황 데이터 | 시설명·주소·좌표·시설 유형 보완 | 140,224 | 🗂️ |
+| 학교개방 체육시설 | 일반인에게 개방된 학교 체육시설 보강 | 1,206 | 🗂️ |
+| 위치기반 체력측정 및 운동처방 정보 | 위치·체력 기반 운동처방 참고 | 1,389,228 | 🗂️ |
+| 체력 측정별 운동처방 데이터 | 체력 수준별 운동 방법과 강도 안내 | 25,070 | 🗂️ |
 
-문화빅데이터 플랫폼에서는 체육시설의 상세 속성, 프로그램, 안전·운영정보와 운동처방 데이터를 활용했습니다. 이 데이터들은 시설 후보를 구성하고, 사용자가 선택한 운동 종목에 맞는 장소와 프로그램을 설명하는 데 사용됩니다.
+#### 그 밖의 외부 서비스
 
-| 데이터 | 주요 활용 |
-| --- | --- |
-| 전국체육시설 현황 | 시설명·유형·주소·좌표를 이용한 기본 시설 후보 구성 |
-| 전국공공체육시설 | 공공 체육시설의 위치·시설 유형 기반 추천 후보 보강 |
-| 공공체육시설 프로그램 | 시설별 운동 프로그램과 종목 정보 제공 |
-| 체육시설 안전점검 | 시설 안전점검 이력을 추천 결과의 참고정보로 제공 |
-| 공공체육시설 운영정보 | 운영시간·휴무·운영 상태 확인 및 추천 시점 보완 |
-| 위치기반 체력측정·운동처방 | 위치와 체력 정보를 연결한 운동처방 참고 |
-| 체력 측정별 운동처방 | 체력 측정 결과에 따른 운동 방법·강도 참고 |
-| 체육시설 | 시설명·주소·종목 등 상세 시설 정보 보강 및 추천 후보 구성 |
+| 서비스 | 활용 내용 | 상태 |
+|---|---|:---:|
+| 카카오 로컬 API | 주소 → 좌표 변환, 좌표 → 행정구역 변환, DB에 시설이 없을 때 장소 검색으로 보완, 시설 공개 페이지 찾기 | ✅ |
+| 시설 공개 홈페이지 | 운영시간·휴무·휴관 문구 확인 (크롤링) | ✅ |
+| OpenAI API | AI 운동 코치 '우심이' 답변 생성 | ✅ |
 
-`체육시설 인접 대중교통`은 문화빅데이터 플랫폼 8종에 포함하지 않고, 별도 공공데이터로 관리합니다. 따라서 출처별 설명에서 문화빅데이터 데이터와 혼합하지 않습니다.
+#### 데이터 활용 구조
 
-두 출처의 데이터는 다음처럼 서비스 기능에 연결됩니다.
-
-```text
-공공데이터포털
-  ├─ 날씨·특보·대기질 → 오늘의 운동 가능 여부·실내외 점수 보정
-  ├─ AED·사고다발지역 → 안전 참고정보
-  ├─ 두루누비·학교개방·대중교통 → 운동 장소·이동 후보 보강
-  └─ API 응답·원본 데이터 → RAW 저장·품질검증
-
-문화빅데이터 플랫폼
-  ├─ 시설·프로그램·운영정보 → 시설 후보·추천 설명·운영 공지 확인
-  ├─ 안전점검 → 시설 안전 참고정보
-  └─ 체력 측정·운동처방 → 운동 종목·운동 방법 안내와 AI 코치 참고
+```mermaid
+flowchart LR
+    subgraph P["🏛️ 공공데이터포털"]
+        P1["체육시설 정보"]
+        P2["기상청 날씨"]
+        P3["에어코리아 대기질"]
+        P4["특보 · AED · 경로"]
+    end
+    subgraph C["📚 문화빅데이터 플랫폼"]
+        C1["공공체육시설 · 프로그램"]
+        C2["안전점검 · 인접 교통"]
+        C3["체력측정 · 운동처방"]
+    end
+    subgraph U["🧭 서비스에서 쓰이는 곳"]
+        U1["추천 시설 후보 · 거리 계산"]
+        U2["실내·실외 추천 점수"]
+        U3["운동 주의 · 안전 안내"]
+        U4["운동 종목 · 방법 · 강도 안내"]
+    end
+    P1 --> U1
+    P2 --> U2
+    P3 --> U2
+    P4 --> U3
+    C1 --> U1
+    C2 --> U3
+    C3 --> U4
 ```
 
-공공데이터를 활용하면 비가 오는 날에는 실외 시설보다 실내 시설을 우선 추천하고, 미세먼지가 높은 날에는 야외 운동을 피하도록 안내할 수 있습니다. 문화빅데이터의 시설·프로그램·운동처방 정보를 결합하면 단순히 가까운 장소를 찾는 데서 그치지 않고, 사용자의 운동 종목과 상황에 맞는 추천 이유까지 설명할 수 있습니다.
+### 2-5. 프로젝트 목표 — "내 방을 꾸미듯, 내 운동 습관도 키울 수 없을까?"
 
-공공데이터를 사용하지 않는다면 시설·날씨·대기질 정보를 직접 수집하거나 임의의 데이터를 사용해야 하므로, 데이터의 최신성·전국 단위 확장성·신뢰성을 확보하기 어렵습니다. 따라서 두 데이터 출처를 역할에 맞게 나누어 수집·정제·검증하고, 최종적으로 추천·운동 기록·AI 운동 코치 기능에 연결했습니다.
+**목표: 운동을 시작할 때의 망설임은 줄이고, 운동을 이어 갈 재미를 만들어 꾸준한 운동을 돕는다.**
 
-### 프로젝트 목표
+| 목표 | 구현 내용 |
+|---|---|
+| 프로필 기반 추천 | 프로필에 저장된 지역과 선호 운동을 기준으로 장소 추천 |
+| 환경 반영 점수 | 거리·날씨·대기질을 반영한 추천 점수와 추천 이유 제공 |
+| 헛걸음 방지 | 추천 시점에 운영·휴무 정보 확인 |
+| 믿을 수 있는 데이터 | 공공데이터와 문화빅데이터 수집·정제·품질검증 |
+| 데이터 관리 | PostgreSQL 원본(RAW)·정제(PROCESSED) 데이터 분리 |
+| 지속의 재미 | 운동 칼로리 기록과 레벨업, 운동방 꾸미기와 친구 방문 |
+| 대화형 도움 | AI 운동 코치 '우심이' 제공 |
 
-싸이월드의 미니룸과 친구 방문처럼, 운동 결과만 보여주는 서비스가 아니라 사용자의 공간과 관계가 쌓이는 경험을 만들고자 했습니다. 운동방을 꾸미고 친구의 공간을 방문하는 흐름을 통해 서비스에 다시 들어올 이유를 만들었습니다.
+> **운동을 시작할 때의 망설임을 줄이고, 이어갈 재미를 제공합니다.**
 
-![프로젝트 소개](docs/images/slides/01-intro.png)
+![운동의 시작과 지속을 하나로 잇기](docs/images/slides/02-goal.png)
 
-운동 장소를 한 번 추천하는 데서 끝내지 않고, 추천받은 운동을 기록하고 누적 운동량에 따라 운동방을 꾸미도록 연결했습니다. AI 운동 코치 ‘우심이’는 사용자가 운동을 고르는 과정에서 질문하고, 추천 결과의 이유를 이해하도록 돕습니다.
-
-![프로젝트 목표](docs/images/slides/02-goal.png)
-
-1. 지역·운동 종목·환경 조건을 반영한 운동 장소 추천 서비스 구현
-2. 추천·AI 운동 코치·운동 기록·운동방 꾸미기를 하나의 사용자 흐름으로 연결
-3. 체육시설·기상·대기질 데이터를 반복 수집할 수 있는 실행 흐름 구성
-4. 수집 원본, 정제 결과, 품질검증 결과, 적재 건수를 평가자가 확인할 수 있도록 기록
-5. 실패한 API 요청과 누락·형식 오류를 로그로 남기고 재실행 가능한 구조 제공
-
-프로젝트의 최종 목표는 공공데이터를 실제 사용자 기능으로 연결하는 것입니다. 단순히 데이터를 수집하는 데서 끝내지 않고, 수집한 시설·날씨·대기질 데이터를 검증하고 저장한 뒤 거리와 환경 조건을 반영한 추천 결과로 제공합니다.
-
-| 목표 | 확인 기준 |
-| --- | --- |
-| 공공데이터 활용 | 체육시설·기상청·에어코리아 API 수집 및 원본 보관 |
-| 데이터 품질 확보 | 누락·중복·좌표·자료형 검증과 오류 로그 기록 |
-| 추천 기능 연동 | 지역·운동 종목·거리·날씨·대기질을 반영한 추천 결과 제공 |
-| 재현 가능한 파이프라인 | 동일한 실행 명령과 스케줄로 수집·전처리·적재 재실행 |
+---
 
 ## 3. 기술 스택
 
 <div align="center">
 
-<p><strong>Frontend</strong></p>
-<p>
-  <img src="https://raw.githubusercontent.com/2nd-MLOps-engineer/hkjfduhalihufsduahufahoiuw/main/docs/images/badges/html5.svg" alt="HTML5" height="24" />
-  <img src="https://raw.githubusercontent.com/2nd-MLOps-engineer/hkjfduhalihufsduahufahoiuw/main/docs/images/badges/css3.svg" alt="CSS3" height="24" />
-  <img src="https://raw.githubusercontent.com/2nd-MLOps-engineer/hkjfduhalihufsduahufahoiuw/main/docs/images/badges/javascript.svg" alt="JavaScript" height="24" />
-</p>
-<p><strong>Backend · Database</strong></p>
-<p>
-  <img src="https://raw.githubusercontent.com/2nd-MLOps-engineer/hkjfduhalihufsduahufahoiuw/main/docs/images/badges/python.svg" alt="Python" height="24" />
-  <img src="https://raw.githubusercontent.com/2nd-MLOps-engineer/hkjfduhalihufsduahufahoiuw/main/docs/images/badges/django.svg" alt="Django" height="24" />
-  <img src="https://raw.githubusercontent.com/2nd-MLOps-engineer/hkjfduhalihufsduahufahoiuw/main/docs/images/badges/postgresql.svg" alt="PostgreSQL" height="24" />
-  <img src="https://raw.githubusercontent.com/2nd-MLOps-engineer/hkjfduhalihufsduahufahoiuw/main/docs/images/badges/postgis.svg" alt="PostGIS" height="24" />
-</p>
+| 분류 | 기술 |
+| :---: | :--- |
+| **Frontend** | <img src="docs/images/badges/html5.svg" alt="HTML5" height="24" /> <img src="docs/images/badges/css3.svg" alt="CSS3" height="24" /> <img src="docs/images/badges/javascript.svg" alt="JavaScript" height="24" /> |
+| **Backend** | <img src="docs/images/badges/python.svg" alt="Python" height="24" /> <img src="docs/images/badges/django.svg" alt="Django" height="24" /> |
+| **Database** | <img src="docs/images/badges/postgresql.svg" alt="PostgreSQL" height="24" /> <img src="docs/images/badges/postgis.svg" alt="PostGIS" height="24" /> |
+| **Collaboration** | <img src="docs/images/badges/github.svg" alt="GitHub" height="24" /> <img src="docs/images/badges/notion.svg" alt="Notion" height="24" /> |
 
 </div>
 
-| 구분 | 기술 | 사용 목적 |
-| --- | --- | --- |
-| Frontend | HTML, CSS, Vanilla JavaScript, Django Templates | 운동방·추천·친구·프로필 화면 |
-| Backend | Python, Django, Gunicorn | 페이지, 세션, 회원, 추천 API |
-| Database | PostgreSQL, PostGIS | 회원·운동량·시설·위치 데이터 |
-| AI chatbot | OpenAI Responses API, Django API, 세션 | 운동 질문 응답, 추천 결과 설명, AI 운동 코치 ‘우심이’ |
-| Data pipeline | Python, requests, BeautifulSoup4, pyproj | API 수집, 공개 정보 확인, 좌표 변환 |
-| Scheduling | APScheduler 또는 cron | 주기적 수집 실행 |
-| Quality | row count, key uniqueness, NULL transition, type validation | 전처리 손실 확인 |
-| Deployment | Render 설정(`render.yaml`), WhiteNoise | 웹 배포 설정과 정적 파일 제공 |
-| Collaboration | GitHub, Notion | 코드·문서·발표자료 협업 |
+| 구분 | 기술 | 사용 목적 | 🙋 쉽게 말하면 |
+|---|---|---|---|
+| Frontend | HTML, CSS, JavaScript, Django Template | 운동방·추천·프로필·친구 화면 | 사용자가 **눈으로 보고 누르는 화면** |
+| Backend | Python, Django | 회원·추천·운동 기록·친구 API | 화면 뒤에서 **요청을 받아 계산하고 저장하는 두뇌** |
+| Database | PostgreSQL, PostGIS | 회원·시설·위치·운동 데이터 | 모든 정보를 담는 **창고**, PostGIS는 "여기서 몇 km?"를 계산하는 **지도 계산기** |
+| Data Collection | requests, BeautifulSoup4 | API 및 운영정보 수집 | 공공데이터를 **받아 오고**, 홈페이지 글자를 **읽어 오는** 도구 |
+| Coordinate | pyproj, PostGIS | 좌표 변환 및 거리 계산 | 서로 다른 좌표 형식을 **하나로 맞추는** 도구 |
+| AI | OpenAI API | AI 운동 코치 | '우심이'의 **대화 능력** |
+| External API | 기상청·에어코리아·카카오 | 날씨·대기질·주소·장소 검색 | 다른 기관이 제공하는 **정보 창구** |
+| Deployment | Gunicorn, WhiteNoise, Render | 서비스 배포 | 누구나 인터넷으로 접속할 수 있게 **서버에 올리는** 도구 |
+| Collaboration | GitHub, Notion, Discord | 협업·문서·알림 | 코드 공유 · 문서 정리 · 팀 대화 |
 
-현재 추천 로직은 학습 모델이 아닌 규칙 기반 점수 계산입니다. 데이터 파이프라인은 공공데이터 수집·정제·품질검증·적재·스케줄링 자동화를 담당하며, 학습 모델 파이프라인을 구현했다고 표현하지 않습니다.
+> 💡 **추천 로직은 학습 모델이 아닌 규칙 기반 점수 계산 방식입니다.**
+> "AI가 알아서 골라준다"가 아니라, 팀이 정한 기준(거리·날씨·미세먼지)에 따라 **점수를 더하고 빼서** 순위를 매깁니다. 그래서 왜 이 시설이 1등인지 **이유를 항상 설명할 수 있습니다.**
+
+### 시스템 구조 — 한 번의 추천 요청은 이렇게 흘러갑니다
+
+```mermaid
+flowchart TB
+    User["👤 사용자<br/>(브라우저)"]
+
+    subgraph Render["☁️ Render 서버"]
+        Django["⚙️ Django 백엔드<br/>회원 · 추천 · 기록 · 친구 · 챗봇"]
+    end
+
+    subgraph DB["🗄️ PostgreSQL + PostGIS"]
+        Svc["서비스 테이블<br/>회원 · 운동기록 · 친구"]
+        Proc["정제 데이터<br/>시설 · 날씨 · 대기질"]
+    end
+
+    subgraph Ext["🌐 외부 서비스"]
+        Kakao["카카오 로컬<br/>주소 ↔ 좌표 · 장소검색"]
+        KMA["기상청"]
+        Air["에어코리아"]
+        Web["시설 공개 홈페이지"]
+        OpenAI["OpenAI<br/>우심이"]
+    end
+
+    Pipe["🔄 데이터 파이프라인<br/>수집 → 정제 → 검증 → 적재"]
+
+    User <-->|"화면 · API 요청"| Django
+    Django <--> Svc
+    Django -->|"시설·날씨·대기질 조회"| Proc
+    Django -.->|"DB에 없을 때만"| KMA
+    Django -.->|"DB에 없을 때만"| Air
+    Django --> Kakao
+    Django -->|"운영·휴무 확인"| Web
+    Django -->|"질문 + 내 기록 + 추천결과"| OpenAI
+    Pipe -->|"주기적 적재"| Proc
+```
+
+![우심운까를 만드는 기술](docs/images/tech-stack.png)
+
+![시스템 아키텍처](docs/images/architecture.png)
+
+---
 
 ## 4. WBS
 
+> **WBS(Work Breakdown Structure)** — 큰 프로젝트를 "누가, 무엇을, 어떤 결과물로" 할지 작은 작업 단위로 쪼갠 표입니다.
+
 | 단계 | 작업 | 산출물 | 담당 |
-| --- | --- | --- | --- |
-| 1 | 요구사항·데이터 출처 확인 | 요구사항 명세서, API 목록 | 전원 |
-| 2 | 원천 데이터 수집 | API 응답 JSON, CSV 원천 | 백선영 |
-| 3 | 전처리·표준화 | 정제 CSV/JSON, 컬럼 매핑 | 백선영 |
-| 4 | 품질검증 | 검증 리포트, 오류 로그 | 백선영·김형준 |
-| 5 | DB 적재 | PostgreSQL 테이블, 적재 건수 | 백선영·김형준 |
-| 6 | 추천 서비스 연동 | Django 추천 API, 추천 화면 | 김형준·신경호·류지예 |
-| 7 | 화면·사용자 흐름 구현 | 운동방, 추천, 기록, 친구 화면 | 신경호·류지예 |
-| 8 | AI 운동 코치 연동 | 챗봇 UI, Django 챗봇 API, 추천 컨텍스트 연결 | 김형준·신경호·류지예 |
-| 9 | 스케줄·실행 기록 | APScheduler/cron 설정, 로그 | 백선영·김형준 |
-| 10 | 통합 테스트·시연 | 캡처, 테스트 결과, 발표자료 | 전원 |
+|:---:|---|---|---|
+| 1 | 서비스 기획 및 요구사항 정의 | 요구사항 명세서 | 전원 |
+| 2 | 공공데이터 조사·선정 | 데이터 목록·활용 목적 | 백선영 |
+| 3 | 데이터 수집 | API 원본 JSON·CSV | 백선영 |
+| 4 | 데이터 전처리·표준화 | 정제 데이터 | 백선영 |
+| 5 | 품질검증 | DQ 결과·오류 로그 | 백선영 |
+| 6 | PostgreSQL 구축 | DB 테이블·적재 결과 | 백선영·김형준 |
+| 7 | 추천 백엔드 구현 | 추천 API·점수 계산 | 김형준 |
+| 8 | 프론트엔드 구현 | 운동방·추천·친구 화면 | 신경호·류지예 |
+| 9 | 운동 기록·레벨 구현 | 칼로리·레벨·보상 기능 | 김형준 |
+| 10 | AI 챗봇 구현 | 우심이 챗봇 | 김형준·프론트엔드 |
+| 11 | 테스트·배포 | 테스트 결과·배포 서비스 | 전원 |
 
-## 5. 요구사항 명세서 (SR / UR)
+```mermaid
+flowchart LR
+    S1["1 기획"] --> S2["2 데이터 조사"] --> S3["3 수집"] --> S4["4 전처리"] --> S5["5 품질검증"] --> S6["6 DB 구축"]
+    S6 --> S7["7 추천 백엔드"]
+    S6 --> S9["9 기록·레벨"]
+    S1 --> S8["8 프론트엔드"]
+    S7 --> S10["10 AI 챗봇"]
+    S7 --> S11["11 테스트·배포"]
+    S8 --> S11
+    S9 --> S11
+    S10 --> S11
 
-### UR: User Requirements
+    classDef data fill:#e8f4ea,stroke:#3a7d44
+    classDef be fill:#e7eefb,stroke:#3b5ba5
+    classDef fe fill:#fdeee6,stroke:#c0643a
+    classDef all fill:#f3f3f3,stroke:#777
+    class S2,S3,S4,S5,S6 data
+    class S7,S9,S10 be
+    class S8 fe
+    class S1,S11 all
+```
 
-<table>
-  <thead>
-    <tr>
-      <th width="12%">ID</th>
-      <th width="46%">사용자 요구사항</th>
-      <th width="22%">연결 SR</th>
-      <th width="20%">검증 방법</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr valign="middle"><td align="center" nowrap="nowrap"><b>UR-01</b></td><td>사용자는 지역과 운동 종목을 선택해 추천받을 수 있다</td><td>SR-01, SR-02, SR-07</td><td>추천 화면 시연</td></tr>
-    <tr valign="middle"><td align="center" nowrap="nowrap"><b>UR-02</b></td><td>사용자는 거리·추천 이유·날씨·대기질을 확인할 수 있다</td><td>SR-02, SR-03, SR-07</td><td>추천 카드 확인</td></tr>
-    <tr valign="middle"><td align="center" nowrap="nowrap"><b>UR-03</b></td><td>사용자는 카카오맵에서 장소 상세정보와 길찾기를 확인할 수 있다</td><td>SR-07, SR-08</td><td>지도 링크 이동 확인</td></tr>
-    <tr valign="middle"><td align="center" nowrap="nowrap"><b>UR-04</b></td><td>사용자는 운동 후 칼로리를 기록하고 누적 운동량을 확인할 수 있다</td><td>SR-11</td><td>운동량 API와 홈 화면 확인</td></tr>
-    <tr valign="middle"><td align="center" nowrap="nowrap"><b>UR-05</b></td><td>사용자는 누적 운동량에 따라 운동방 소품을 열 수 있다</td><td>SR-11</td><td>운동방 보상 변화 확인</td></tr>
-    <tr valign="middle"><td align="center" nowrap="nowrap"><b>UR-06</b></td><td>사용자는 프로필과 선호 운동 조건을 저장할 수 있다</td><td>SR-12</td><td>프로필 저장 확인</td></tr>
-    <tr valign="middle"><td align="center" nowrap="nowrap"><b>UR-07</b></td><td>사용자는 친구 코드로 친구를 조회하고 운동 한마디를 남길 수 있다</td><td>SR-12</td><td>친구 화면 시연</td></tr>
-    <tr valign="middle"><td align="center" nowrap="nowrap"><b>UR-08</b></td><td>사용자는 AI 운동 코치에게 운동 방법과 추천 결과를 질문할 수 있다</td><td>SR-13</td><td>AI 코치 화면 시연</td></tr>
-  </tbody>
-</table>
+<sub>🟩 데이터 · 🟦 백엔드 · 🟧 프론트엔드 · ⬜ 전원</sub>
 
-### SR: System Requirements
+---
 
-<table>
-  <thead>
-    <tr>
-      <th width="12%">ID</th>
-      <th width="14%">구분</th>
-      <th width="44%">시스템 요구사항</th>
-      <th width="30%">검증 방법</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr valign="middle"><td align="center" nowrap="nowrap"><b>SR-01</b></td><td>수집</td><td>체육시설 API에서 지역별 시설 데이터를 수집한다</td><td><code>frontend/collector.py</code> 실행 및 수집 건수 확인</td></tr>
-    <tr valign="middle"><td align="center" nowrap="nowrap"><b>SR-02</b></td><td>수집</td><td>기상청·에어코리아 데이터를 수집한다</td><td>원본 JSON과 요청 시각 확인</td></tr>
-    <tr valign="middle"><td align="center" nowrap="nowrap"><b>SR-03</b></td><td>전처리</td><td>시설명·주소·좌표·유형 필드를 표준 컬럼으로 변환한다</td><td>정제 CSV 컬럼과 샘플 행 확인</td></tr>
-    <tr valign="middle"><td align="center" nowrap="nowrap"><b>SR-04</b></td><td>검증</td><td>행 수, 필수 식별자, 타입 오류, NULL 변화를 기록한다</td><td>로그와 품질검증 결과 확인</td></tr>
-    <tr valign="middle"><td align="center" nowrap="nowrap"><b>SR-05</b></td><td>적재</td><td>검증을 통과한 정제 데이터를 PostgreSQL에 적재한다</td><td>적재 전후 건수와 DB 조회 결과 확인</td></tr>
-    <tr valign="middle"><td align="center" nowrap="nowrap"><b>SR-06</b></td><td>자동화</td><td>수집부터 적재까지 설정된 주기로 반복 실행한다</td><td>스케줄 설정과 실행 로그 확인</td></tr>
-    <tr valign="middle"><td align="center" nowrap="nowrap"><b>SR-07</b></td><td>추천</td><td>지역·운동 종목·거리·환경 조건으로 후보를 정렬한다</td><td>추천 API 응답 및 화면 시연</td></tr>
-    <tr valign="middle"><td align="center" nowrap="nowrap"><b>SR-08</b></td><td>예외</td><td>API 오류·좌표 누락·운영정보 확인 불가를 실패 또는 확인 필요로 남긴다</td><td>오류 로그와 리포트 확인</td></tr>
-    <tr valign="middle"><td align="center" nowrap="nowrap"><b>SR-09</b></td><td>보안</td><td>API 키와 DB 비밀번호를 환경변수로 관리한다</td><td><code>.env.example</code>과 배포 환경변수 확인</td></tr>
-    <tr valign="middle"><td align="center" nowrap="nowrap"><b>SR-10</b></td><td>재현성</td><td>같은 명령으로 로컬 수집과 검증을 재실행할 수 있다</td><td>실행 방법 재현 테스트</td></tr>
-    <tr valign="middle"><td align="center" nowrap="nowrap"><b>SR-11</b></td><td>회원 데이터</td><td>회원의 운동량·칼로리·운동방 상태를 저장하고 조회한다</td><td>운동량 API와 DB 조회 확인</td></tr>
-    <tr valign="middle"><td align="center" nowrap="nowrap"><b>SR-12</b></td><td>사용자 기능</td><td>프로필·친구·운동 한마디 데이터를 저장하고 제공한다</td><td>프로필·친구 화면 시연</td></tr>
-    <tr valign="middle"><td align="center" nowrap="nowrap"><b>SR-13</b></td><td>AI 코치</td><td>서버에서 AI API를 호출하고 사용자 맥락과 추천 결과를 반영해 답변한다</td><td><code>/api/chatbot/</code> 응답과 오류 처리 확인</td></tr>
-  </tbody>
-</table>
+## 5. 요구사항 명세서
+
+> **요구사항 명세서** — "이 서비스는 무엇을 할 수 있어야 하는가"를 약속처럼 적어 둔 목록입니다.
+> **사용자 요구사항**은 사용자가 직접 쓰는 기능, **시스템 요구사항**은 눈에 보이지 않지만 서비스가 지켜야 할 기준입니다.
+
+### 5-1. 사용자 요구사항
+
+| ID | 요구사항 | 구현 위치 (화면 / API) |
+|---|---|---|
+| UR-01 | 회원가입·로그인 (게스트 체험 포함) | 회원가입·로그인 화면, `guest/start/` |
+| UR-02 | 기본 운동 지역과 선호 운동 저장 | PROFILE 화면 |
+| UR-03 | 운동 장소 추천 | MOVE 화면, `GET /api/live-recommendations/` |
+| UR-04 | 거리·날씨·대기질 확인 | 추천 결과 카드 |
+| UR-05 | 추천 점수와 추천 이유 확인 | 추천 결과 카드 |
+| UR-06 | 운동 칼로리 기록 | 운동방·RECORD 화면, `POST /api/workout-calories/` |
+| UR-07 | 레벨·경험치 확인 | 운동방 레벨 바 |
+| UR-08 | 레벨 초기화 및 최근 기록 되돌리기 | `/api/workout-calories/reset/`, `/undo/` |
+| UR-09 | 운동방 꾸미기 | 운동방 꾸미기 패널, `/api/room-state/` |
+| UR-10 | 캐릭터 선택 | 캐릭터 스킨 · 펫(용) 선택, `/api/dragon-character/` |
+| UR-11 | 친구 추가·방문·운동 한마디 | FRIENDS 화면, `/api/friends/…`, `/api/friend-notes/…` |
+| UR-12 | AI 운동 코치 사용 | 챗봇 창, `POST /api/chatbot/` |
+
+### 5-2. 시스템 요구사항
+
+| ID | 요구사항 | 어떻게 지키나요? |
+|---|---|---|
+| SR-01 | 시설·날씨·대기질 데이터 수집 | 공공데이터 API 수집 스크립트 (`collector.py`) |
+| SR-02 | 원본·정제 데이터 분리 | RAW 저장 후 PROCESSED 스키마에 정제본 적재 |
+| SR-03 | 결측·중복·좌표·자료형 검증 | 필수값·중복(시설명+주소)·위경도 범위·숫자형 검사 |
+| SR-04 | 추천 점수 내림차순 정렬 | 점수 높은 순, 동점이면 가까운 순 |
+| SR-05 | API 오류 재시도 | 실패 시 최대 3회, 1.5초·3초 간격으로 재요청 |
+| SR-06 | 운영정보 확인 실패 시 `확인 필요` 표시 | 크롤링 실패해도 시설은 유지하고 상태만 표시 |
+| SR-07 | API 키와 DB 정보를 환경변수로 관리 | `.env` / Render 환경변수, 저장소에 커밋하지 않음 |
+| SR-08 | 챗봇 API 키를 서버에서만 관리 | 브라우저는 Django 서버하고만 통신, 키는 서버에만 존재 |
+| SR-09 | 운동 기록 입력값 검증 | 1kcal 미만·숫자 아님 → 거부, 게스트는 저장 불가 |
+| SR-10 | 실행 로그와 오류 기록 | 단계별 건수·상태·오류를 로그로 기록 |
+| SR-11 | 비밀번호 보호 | 원문이 아닌 **해시(암호화된 값)** 로만 저장 |
+| SR-12 | 크롤링 예절 준수 | `robots.txt`에서 허용된 페이지만 접근 |
+
+---
 
 ## 6. ERD
 
-웹 서비스의 핵심 엔터티는 다음과 같습니다.
+> **ERD(Entity Relationship Diagram)** — 데이터베이스에 어떤 표(테이블)가 있고, 표끼리 어떻게 연결되는지 그린 그림입니다.
+> 예를 들어 "회원 1명은 운동기록 1개를 가진다", "회원 1명은 친구를 여러 명 가질 수 있다" 같은 관계를 나타냅니다.
+
+### 6-1. 주요 테이블
+
+| 테이블 | 쉽게 말하면 | 주요 정보 |
+|---|---|---|
+| `Member` | 회원 카드 | 이름·닉네임·비밀번호 해시·주소·**친구 코드(USIM-XXXXXX)**·방 꾸미기 상태 |
+| `WorkoutProgress` | 운동 통장 | 누적 칼로리, 최근 운동 기록(최대 30건) → 레벨 자동 계산 |
+| `Friendship` | 친구 목록 | 누가 누구와 친구인지 (양방향 저장) |
+| `FriendRequest` | 친구 신청서 | 요청자·수신자·상태(대기/승인/거절) |
+| `FriendNote` | 운동 한마디 | 작성자·내용(최대 60자) |
+| `SiteVisit` | 방문 도장 | 하루 한 번 방문 기록 (방문자 수 집계) |
+| `Profile` | 추천용 프로필 | 닉네임·연령대·도시 (기존 추천 기능 호환) |
+
+### 6-2. 관계도
 
 ```mermaid
 erDiagram
-    MEMBER ||--o| WORKOUT_PROGRESS : has
-    MEMBER ||--o{ FRIENDSHIP : creates
-    MEMBER ||--o{ FRIEND_REQUEST : sends
-    MEMBER ||--o{ FRIEND_NOTE : writes
-    MEMBER ||--o{ SITE_VISIT : records
+    MEMBER ||--o| WORKOUT_PROGRESS : "운동 기록 1개"
+    MEMBER ||--o{ FRIENDSHIP : "친구 여러 명"
+    MEMBER ||--o{ FRIEND_REQUEST : "친구 요청 보냄/받음"
+    MEMBER ||--o{ FRIEND_NOTE : "한마디 작성"
+
     MEMBER {
         int id PK
-        string name
-        string nickname UK
-        string password_hash
-        string address
-        string friend_code UK
-        json room_state
-        json room_layout
+        string name "이름"
+        string nickname UK "닉네임"
+        string password_hash "비밀번호 해시"
+        string address "기본 운동 지역"
+        string friend_code UK "USIM-XXXXXX"
+        json room_state "방 꾸미기 상태"
+        json room_layout "가구 배치"
+        string selected_dragon_design "펫 디자인"
+        datetime created_at
     }
     WORKOUT_PROGRESS {
         int id PK
-        int member_id FK
-        int total_calories
-        json entries
+        int member_id FK "회원과 1:1"
+        int total_calories "누적 칼로리"
+        json entries "최근 기록 30건"
+        datetime updated_at
     }
     FRIENDSHIP {
         int id PK
         int member_id FK
         int friend_id FK
+        datetime created_at
     }
     FRIEND_REQUEST {
         int id PK
-        int requester_id FK
-        int recipient_id FK
-        string status
+        int requester_id FK "보낸 사람"
+        int recipient_id FK "받는 사람"
+        string status "pending / accepted / declined"
+        datetime responded_at
     }
     FRIEND_NOTE {
         int id PK
         int author_id FK
-        text note_text
+        text text "최대 60자"
+        datetime created_at
     }
     SITE_VISIT {
         int id PK
-        string visitor_key
-        date visited_on
+        string visitor_key "방문자 식별값"
+        date visited_on "하루 1회"
+    }
+    PROFILE {
+        int id PK
+        string nickname UK
+        string age_group
+        string city
     }
 ```
 
-파이프라인 데이터는 서비스 테이블과 분리해 `raw` 원본과 `processed` 정제 데이터로 관리하는 것을 기준으로 합니다. 현재 코드의 DB 우선 추천은 `processed.facility`, `facility_processed`, `processed.weather_ultra_ncst`, `processed.air_quality`가 존재하면 우선 조회하고, 없을 때 외부 API 또는 백업 CSV로 보완합니다.
+```text
+Member 1 ─── 1 WorkoutProgress
+Member 1 ─── N Friendship
+Member 1 ─── N FriendRequest
+Member 1 ─── N FriendNote
+SiteVisit · Profile 은 독립 테이블 (방문 집계 · 추천 호환용)
+```
 
-### 날씨 데이터 수집 기준
+### 6-3. 추천에 쓰이는 데이터 테이블
 
-날씨 데이터는 공공데이터포털의 기상청 API를 통해 수집합니다.
+시설·날씨·대기질 데이터는 PostgreSQL의 원본·정제 테이블에 있고, 추천 서비스가 **조회만** 합니다.
+정제 스키마(`processed.*`)를 먼저 찾고, 없으면 기존 테이블 → 백업 CSV 순서로 대체합니다.
 
-- 제공기관: 기상청
-- 사용 API: 초단기실황 및 단기예보 API
-- 위치 기준: 기상청 격자 좌표 `nx`, `ny`
-- 기본 설정: `KMA_NX`, `KMA_NY` 환경변수
-- 기본 격자: `nx=60`, `ny=127`
+| 정제 테이블 | 주요 컬럼 | 용도 |
+|---|---|---|
+| `processed.facility` | 시설명·유형·시도·시군구·주소·위도·경도 | 시설 후보 조회, PostGIS 거리 계산 |
+| `processed.weather_ultra_ncst` | 격자(nx, ny), 항목(T1H·REH·PTY·RN1·WSD), 관측값, 수집 시각 | 날씨 보정 |
+| `processed.air_quality` | 시도·측정소, PM10·PM2.5·O3·통합대기지수, 측정 시각 | 대기질 보정 |
 
-추천 기능에서는 초단기실황 데이터의 최신값을 우선 사용합니다.
-
-| 날씨 항목 | API 코드 | 활용 목적 |
-| --- | --- | --- |
-| 기온 | `T1H` | 실외 운동 적합 여부 판단 |
-| 습도 | `REH` | 고습도 환경에서 실내 시설 우선 |
-| 1시간 강수량 | `RN1` | 현재 강수 여부 판단 |
-| 강수 형태 | `PTY` | 비·눈 등 강수 형태 확인 |
-| 풍속 | `WSD` | 강풍 시 실외 시설 감점 |
-
-날씨 데이터가 없을 경우 임의의 값을 생성하지 않고, 날씨 조건을 추천 점수에서 제외한 뒤 데이터 부족 상태를 기록합니다.
-
-### 대기질 데이터 수집 기준
-
-대기질 데이터는 공공데이터포털의 에어코리아 실시간 측정 API를 사용합니다. 사용자의 지역과 일치하는 측정소를 우선 조회하고, 지역 측정소가 없으면 같은 시도 내 최신 측정소를 사용합니다.
-
-- PM10이 81 이상이거나 PM2.5가 36 이상이면 대기질이 좋지 않은 상태로 판단
-- 대기질이 좋지 않으면 실내 시설을 우선 추천
-- 대기질이 양호하면 실외 시설에 가점 적용
-
-### 데이터 조회 및 거리 계산 우선순위
-
-추천 요청이 들어오면 매번 외부 API만 호출하지 않고 적재된 데이터를 먼저 확인합니다. 이를 통해 API 호출을 줄이고 응답 속도와 결과 재현성을 높입니다.
-
-#### 시설 데이터 우선순위
-
-1. `processed.facility`
-2. `facility_processed`
-3. `frontend/db_backup/facility_processed.csv`
-4. DB와 백업 파일에 결과가 없을 경우 카카오 장소 검색 API로 임시 보완
-
-카카오 장소 검색 결과는 공공데이터 시설과 구분하며, DB에 저장하지 않고 해당 요청의 결과에만 사용합니다.
-
-#### 환경 데이터 우선순위
-
-| 데이터 | 1순위 | 2순위 | 3순위 |
-| --- | --- | --- | --- |
-| 날씨 | `processed.weather_ultra_ncst` | `weather_ultra_ncst` | 기상청 API |
-| 대기질 | `processed.air_quality` | `air_quality_processed` | 에어코리아 API |
-
-DB에 저장된 환경 데이터는 수집 시각 또는 측정 시각이 가장 최신인 값을 사용합니다.
-
-#### 거리 계산 우선순위
-
-1. 사용자가 위치 제공에 동의한 경우 현재 GPS 좌표를 기준으로 계산
-2. PostGIS의 `ST_Distance`로 시설까지의 거리 계산
-3. DB 거리 값이 없거나 좌표 형식이 잘못된 경우 위도·경도 기반 거리 계산으로 보완
-4. GPS 좌표가 없으면 선택 지역의 중심 좌표를 기준으로 계산
-5. 시설 좌표가 없으면 거리 정보를 `확인 필요`로 표시하고 후순위 처리
-
-최종 추천은 추천 점수 내림차순으로 정렬하고, 점수가 같은 경우 거리가 가까운 시설을 우선합니다. 거리 정보가 없는 시설은 가장 뒤로 보냅니다.
+---
 
 ## 7. 주요 프로시저
 
-### 7.1 데이터 파이프라인
+> **프로시저** — 서비스 안에서 일이 처리되는 **순서**입니다. 요리 레시피처럼 "무엇을 먼저 하고 다음에 무엇을 하는지"를 정리했습니다.
 
-서비스에 필요한 공공데이터는 API 및 Selenium 크롤링으로 수집하고, PostgreSQL에서 원본과 정제 데이터를 분리하여 관리합니다.
+### 7-1. 추천 점수 계산
 
-```text
-공공데이터 API / Selenium 크롤링
-                ↓
-          PostgreSQL RAW
-                ↓
-    Cleaning / Transformation
-                ↓
-           Data Quality
-                ↓
-       PostgreSQL PROCESSED
-                ↓
-              Backend
+#### 추천은 이런 순서로 만들어집니다
+
+```mermaid
+flowchart TD
+    A["👤 프로필 지역 · 선호 운동 · 최대 이동시간"] --> B{"현재 위치를<br/>허용했나요?"}
+    B -->|"예"| C["내 위치 좌표 사용"]
+    B -->|"아니요"| D["카카오로 지역 중심 좌표 계산"]
+    C --> E["🗄️ DB에서 시설 후보 조회<br/>+ PostGIS로 거리 계산"]
+    D --> E
+    E --> F["🏷️ 운동 종목 필터<br/>헬스 · 러닝 · 자전거 · 크로스핏"]
+    F --> G["⏱️ 이동시간 초과 · 비정상 거리 제외"]
+    G --> H{"남은 후보가<br/>있나요?"}
+    H -->|"없음"| I["🔎 카카오 장소 검색으로 보완"]
+    H -->|"있음"| J["🌦️ 날씨 · 대기질로 실내/실외 점수 보정"]
+    I --> K
+    J --> K["📊 점수순 정렬 → 상위 20개"]
+    K --> L["🌐 상위 10개 시설 운영·휴무 공지 확인<br/>(5개씩 동시에)"]
+    L --> M["📉 '오늘 휴관' 등 발견 시 −25점"]
+    M --> N["🏆 최종 정렬 → 추천 카드"]
 ```
 
-파이프라인은 데이터 수집·정제·품질검증·적재를 자동화하고, APScheduler를 이용해 데이터셋별 주기로 실행합니다. 실행 이력과 DQ 결과는 로그 및 `monitoring.pipeline_run_history`에 기록하며, 실패·이상 발생 시 팀 Discord 채널로 알림을 전송합니다. 세부 수집 방식, 데이터 품질검증, 장애 복구 및 운영 구조는 3차 수정된 데이터 파이프라인 README를 참고합니다.
+#### 점수 공식
 
-![데이터 파이프라인 흐름](docs/images/slides/05-pipeline.png)
+```text
+기본 점수 (45)
++ 거리 점수 (최대 40)
++ 날씨·대기질 보정
+- 운영정보 감점
+= 최종 추천 점수 (0 ~ 99점)
+```
 
-세부 시스템 구성은 다음과 같습니다.
+| 조건 | 점수 | 이유 |
+|---|---:|---|
+| 기본 점수 | 45 | 모든 후보의 출발점 |
+| 거리 | `40 − 거리(km) × 18` (최소 0) | 가까울수록 높음 (1km → +22, 2km → +4) |
+| 비 · 실내 시설 | **+8** | 비 오는 날엔 실내가 좋음 |
+| 비 · 실외 시설 | **−24** | 비 오는 날 야외 운동은 어려움 |
+| 실외 · 기온 10~25℃ | +6 | 야외 운동하기 좋은 날씨 |
+| 실외 · 기온 5℃ 미만 또는 30℃ 초과 | −10 | 너무 춥거나 더움 |
+| 실외 · 습도 40~70% | +4 | 쾌적함 |
+| 실외 · 습도 80% 이상 | −8 | 너무 습함 |
+| 실외 · 풍속 8m/s 이상 | −8 | 바람이 강함 |
+| 미세먼지 나쁨 (PM10 ≥ 81 또는 PM2.5 ≥ 36) · 실내 | **+14** | 공기가 나쁘면 실내로 |
+| 대기질 양호 · 실외 | +5 | 밖에서 운동해도 괜찮음 |
+| 운영 공지에 "오늘 휴무 · 금일 휴무 · 오늘 휴관 · 임시 휴관" | **−25** | 헛걸음 방지 |
 
-![시스템 아키텍처](docs/images/architecture.png)
-![데이터 흐름](docs/images/data-flow.png)
+#### 같은 거리, 다른 날씨 — 계산 예시
 
-### 7.2 공공데이터 수집·정제·품질 검증 결과
+두 시설 모두 **1km** 거리이고, **비가 오고 미세먼지가 나쁜** 날이라고 가정합니다.
 
-아래 수치는 데이터 엔지니어링 파이프라인 실행 결과입니다. `품질 확인 필요 건수`는 확인 대상으로 남긴 건수이며, `제외 건수`는 정제 규칙에 따라 PROCESSED 적재 대상에서 제외한 건수입니다.
+| 항목 | 🏋️ 실내 헬스장 | 🏞️ 공원 운동장 |
+|---|---:|---:|
+| 기본 점수 | 45 | 45 |
+| 거리 점수 (40 − 1 × 18) | +22 | +22 |
+| 비 보정 | +8 | −24 |
+| 미세먼지 나쁨 → 실내 가점 | +14 | 0 |
+| **합계** | **89점** 🥇 | **43점** |
 
-| 데이터셋 | 수집 건수 | 정제 건수 | 품질 확인 필요 건수 | 제외 건수 | DB 적재 건수 |
-| --- | ---: | ---: | ---: | ---: | ---: |
-| AED | 63,626 | 63,626 | 0 | 0 | 63,626 |
-| 대기질 | 1,402 | 1,402 | 157 | 0 | 1,402 |
-| 자전거 사고다발지역 | 5,046 | 5,046 | 0 | 0 | 5,046 |
-| 체력 측정별 운동처방 | 25,070 | 25,070 | 0 | 0 | 25,070 |
-| 위치기반 체력측정·운동처방 | 1,389,228 | 1,389,228 | 0 | 0 | 1,389,228 |
-| 전국체육시설 현황 | 152,968 | 140,224 | 1,598 | 12,744 | 140,224 |
-| 학교개방 체육시설 | 1,206 | 1,206 | 0 | 0 | 1,206 |
-| 전국공공체육시설 | 44,612 | 42,879 | 10,553 | 1,733 | 42,879 |
-| 공공체육시설 프로그램 | 408,761 | 401,865 | 123,612 | 6,896 | 401,865 |
-| 체육시설 인접 대중교통 | 1,639,279 | 1,639,279 | 201,449 | 0 | 1,639,279 |
-| 체육시설 안전점검 | 192,314 | 182,365 | 0 | 9,949 | 182,365 |
-| 두루누비 구간 | 139 | 139 | 0 | 0 | 139 |
-| 두루누비 경로 | 4 | 4 | 0 | 0 | 4 |
-| 체육시설 | 153,605 | 106,521 | 0 | 47,084 | 106,521 |
-| 공공체육시설 운영정보 | 7,334 | 7,331 | 0 | 3 | 7,331 |
-| 초단기예보 | 198 | 198 | 0 | 0 | 198 |
-| 초단기실황 | 24 | 24 | 0 | 0 | 24 |
-| 기상특보 | 186 | 128 | 0 | 58 | 128 |
-| 기상특보 현황 | 1 | 0 | 0 | 1 | 0 |
-| **합계** | **4,085,003** | **4,006,535** | **337,369** | **78,468** | **4,006,535** |
+```mermaid
+xychart-beta
+    title "같은 1km, 비 + 미세먼지 나쁨인 날의 점수"
+    x-axis ["실내 헬스장", "공원 운동장"]
+    y-axis "추천 점수" 0 --> 100
+    bar [89, 43]
+```
 
-**건수 검산:** `4,085,003 = 4,006,535(PROCESSED 반영) + 78,468(정제 과정 제외)`
+> **같은 거리여도, 오늘의 환경에 맞는 장소를 먼저 보여줍니다.**
+> 추천 카드에는 "비가 와서 실내 시설 우선", "미세먼지가 높아 실내 시설 우선" 처럼 **점수가 바뀐 이유**가 함께 표시됩니다.
 
-### 7.3 품질검사(DQ) 전·후
+![같은 두 시설, 날씨에 따라 순위가 바뀝니다](docs/images/slides/04-score.png)
+
+<sub>코드: [`frontend/recommendation_service.py`](frontend/recommendation_service.py) · `make_recommendations`</sub>
+
+### 7-2. 데이터 파이프라인
+
+> **데이터 파이프라인** — 공장 컨베이어 벨트처럼, 데이터를 **받아 오고 → 씻고 → 검사하고 → 창고에 넣는** 과정을 자동으로 반복하는 흐름입니다.
+
+```mermaid
+flowchart TD
+    A["🏛️ 공공데이터 API · 문화빅데이터"] -->|"수집 (실패 시 최대 3회 재시도)"| B[("📦 PostgreSQL RAW<br/>받은 그대로 보존")]
+    B --> C["🧹 Cleaning · Transformation<br/>필드명 통일 · 자료형 변환 · 좌표 정리"]
+    C --> D{"✅ Data Quality<br/>필수값 · 중복 · 좌표 범위"}
+    D -->|"통과"| E[("🗄️ PostgreSQL PROCESSED<br/>정제 데이터")]
+    D -->|"실패"| F["🚫 적재 차단 · 오류 데이터 분리"]
+    E --> G["⚙️ Backend 추천 서비스"]
+    B -.-> L["📝 실행 로그<br/>run_id · 단계별 건수 · 상태 · 오류"]
+    D -.-> L
+    F -.-> L
+```
+
+| 단계 | 하는 일 | 예시 |
+|---|---|---|
+| 수집 | 시설·기상·대기질 API 호출 | 502·503·504 응답이면 잠시 후 다시 요청 |
+| 원본 보존 (RAW) | 받은 응답을 손대지 않고 저장 | 나중에 "원래 값이 뭐였지?"를 확인할 수 있음 |
+| 정제 (Cleaning) | 제각각인 필드를 표준 컬럼으로 통일 | `faci_nm` → `facility_name`, 문자열 좌표 → 숫자 |
+| 품질검증 (DQ) | 필수값 누락·중복·좌표 범위 검사 | 좌표 (0, 0)·범위 밖 값은 통과시키지 않음 |
+| 적재 (PROCESSED) | 검증을 통과한 데이터만 저장 | 추천 서비스는 이 데이터만 조회 |
+| 로그 | 실행 번호·건수·상태·오류 기록 | 어느 단계에서 몇 건이 빠졌는지 추적 |
+
+![한 번이 아니라, 반복해서 처리되는 구조](docs/images/slides/05-pipeline.png)
+
+![데이터 수집·보완·추천 흐름](docs/images/data-flow.png)
+
+### 7-3. 크롤링 (운영·휴무 정보 확인)
+
+> **크롤링** — 사람이 웹페이지를 열어 읽듯, 프로그램이 공개된 웹페이지의 글자를 자동으로 읽어 오는 것입니다.
+
+시설 기본정보만으로는 추천 시점의 **휴무·휴관·임시 운영중단** 여부를 알기 어렵습니다. "오늘 임시 휴관" 같은 최신 공지는 공공데이터에 없기 때문입니다.
+그래서 **사용자가 추천을 요청하는 순간**, 상위 후보 시설의 공개 홈페이지에서 다음 문구를 찾습니다.
+
+`휴관` · `휴무` · `운영시간` · `공사` · `점검` · `임시` · `이용 제한` · `폐관` · `예약`
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant S as ⚙️ 추천 서버
+    participant K as 🗺️ 카카오 로컬
+    participant R as 📜 robots.txt
+    participant W as 🌐 시설 홈페이지
+
+    S->>S: 점수 상위 10개 시설 선택
+    alt 홈페이지 주소가 없으면
+        S->>K: 시설명 + 주소로 장소 검색
+        K-->>S: 장소 페이지 주소
+    end
+    S->>R: 이 페이지를 읽어도 되나요?
+    alt 허용 안 됨
+        R-->>S: 차단 → blocked_by_robots (확인 필요)
+    else 허용
+        S->>W: 페이지 요청
+        W-->>S: HTML
+        S->>S: 휴관·휴무·운영시간 문구 추출
+        S->>S: "오늘 휴관" 등 발견 시 −25점
+    end
+    S->>S: 점수순 재정렬 → 추천 카드에 공지 표시
+```
+
+| 결과 상태 | 의미 | 화면 표시 |
+|---|---|---|
+| `ok` | 공지 문구를 찾음 | 추천 카드에 운영 공지 표시 |
+| `no_homepage` / `no_public_page` | 공개 페이지가 없음 | 확인 필요 |
+| `blocked_by_robots` | 사이트가 자동 접근을 허용하지 않음 | 접근하지 않고 확인 필요 |
+| `request_failed` / `crawl_failed` | 페이지 요청 실패 | 시설은 유지, 확인 필요 |
+
+> - 5개 시설을 **동시에** 확인해 기다리는 시간을 줄였습니다.
+> - 크롤링 결과는 **그 요청에만 사용하고 DB에 저장하지 않습니다.**
+> - 문구 추출 방식이라 "영업 여부를 완벽하게 판별"하기보다 **"공지를 확인해 헛걸음 가능성을 줄인다"** 가 정확한 설명입니다.
+
+![오늘 문 열었나?는 API에 없어서 직접 확인합니다](docs/images/slides/06-crawling.png)
+
+<sub>코드: [`frontend/recommendation_service.py`](frontend/recommendation_service.py) `_attach_live_operation_evidence` · [`frontend/collector.py`](frontend/collector.py) `web_evidence`</sub>
+
+### 7-4. 예외 처리
+
+> 데이터가 없거나 틀렸을 때 **서비스가 멈추지 않도록**, 그리고 **없는 정보를 지어내지 않도록** 미리 기준을 정했습니다.
+
+| 예외 상황 | 처리 방법 |
+|---|---|
+| API 요청 실패 | 최대 3회 재시도 |
+| 502·503·504 응답 | 1.5초 → 3초 간격으로 재요청 |
+| JSON이 아닌 응답 | 오류 응답과 URL 기록 |
+| API 키 누락 | 환경변수 오류 안내 |
+| 시설 데이터 없음 | 백업 데이터 또는 카카오 장소 검색으로 보완 (별도 거리 점수식 사용) |
+| 날씨·대기질 없음 (DB) | 기상청·에어코리아 API를 직접 호출해 보완 |
+| 날씨·대기질 모두 없음 | 해당 조건을 점수에서 제외 |
+| 좌표 누락 | 거리 계산 제외 또는 후순위 처리 (이동시간 `확인 필요`) |
+| 잘못된 좌표 (범위 밖·500km 초과) | 적재 전 오류 데이터로 분리, 추천 후보에서 제외 |
+| 위치 권한 거부 | 선택한 지역의 중심 좌표로 대체 |
+| 홈페이지 없음 | `no_homepage` 기록 |
+| robots.txt 차단 | 크롤링 중단 |
+| 운영 페이지 요청 실패 | `request_failed` 기록 |
+| AI API 실패 | 오류 메시지와 재시도 안내, 추천 데이터 조회 실패 시에도 챗봇은 계속 답변 |
+
+> 확인되지 않은 데이터를 임의로 만들지 않고 `NULL`, `확인 필요`, `데이터 없음`으로 구분합니다.
+
+![잘못된 데이터가 들어오면? 기준을 정해 뒀습니다](docs/images/slides/07-exception.png)
+
+### 7-5. AI 운동 코치 '우심이'
+
+'우심이'는 일반 챗봇과 달리 **내 운동 기록과 우심운까의 추천 결과를 알고 대답**합니다.
+
+| 우심이가 참고하는 정보 | 예시 |
+|---|---|
+| 회원 프로필 · 운동 지역 · 선호 운동 | 서울특별시 관악구 · 헬스 · 러닝 |
+| 최근 운동 기록 (최근 5건) · 누적 칼로리 · 레벨 | 3,200kcal · LV.12 |
+| 추천 시설 상위 3곳 · 점수 · 추천 이유 · 운영 공지 | "비가 와서 실내 시설 우선" |
+| 날씨 · 대기질 수치 | 기온 18℃, PM10 45 |
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor U as 👤 사용자
+    participant B as 🖥️ 브라우저
+    participant D as ⚙️ Django 챗봇 API
+    participant R as 📊 추천 엔진
+    participant O as 🤖 OpenAI
+
+    U->>B: "오늘 비 오는데 어디서 운동할까?"
+    B->>D: 질문 + 프로필 (API 키 없음)
+    D->>D: '추천' · '날씨' · '근처' 같은 단어가 있나 확인
+    D->>R: 있으면 추천 결과 요청
+    R-->>D: 상위 3곳 · 점수 · 이유
+    D->>O: 우심이 규칙 + 내 기록 + 추천 결과 + 질문
+    O-->>D: 답변
+    D-->>B: 우심이 답변 + 추천 카드
+    B-->>U: 화면에 표시
+```
+
+**우심이의 규칙**
+
+- 항상 한국어 존댓말로, 짧고 친근하게 답합니다.
+- 제공된 추천 데이터를 **가장 우선**하고, 모르는 실시간 날씨·운영 여부를 **아는 척하지 않습니다.**
+- 통증·호흡곤란·흉통 같은 위험 신호가 나오면 **운동 중단과 의료 전문가 상담**을 안내합니다.
+- 극단적인 다이어트 방법을 권하지 않습니다.
+- **OpenAI API 키는 서버에만 있고**, 브라우저에는 절대 전달되지 않습니다.
+
+<sub>코드: [`frontend/chatbot_service.py`](frontend/chatbot_service.py)</sub>
+
+### 7-6. 운동 기록 · 레벨업 · 운동방 보상
+
+```mermaid
+flowchart LR
+    A["🏃 칼로리 입력"] --> B{"1kcal 이상?<br/>회원인가?"}
+    B -->|"아니요"| X["❌ 저장 거부"]
+    B -->|"예"| C["💾 누적 칼로리에 더하기<br/>최근 기록 30건 보관"]
+    C --> D["⭐ 레벨 계산<br/>LV.1 ~ LV.100"]
+    D --> E["🎁 캐릭터 스킨 · 펫 성장 · 방 꾸미기 해제"]
+    C -.->|"실수했다면"| U["↩️ 최근 기록 되돌리기"]
+    C -.->|"처음부터"| R["🔄 레벨 초기화"]
+```
+
+- **누적 칼로리 저장** — 운동할 때마다 기록이 쌓입니다.
+- **최대 100레벨, 최대 레벨 기준 600,000kcal**
+- **레벨이 오를수록 다음 레벨까지 필요한 칼로리가 늘어납니다.** (게임처럼 초반엔 빨리, 후반엔 천천히)
+- **최근 운동 기록 되돌리기**, **레벨 초기화** 지원
+- **100레벨 이후에도 칼로리 기록은 계속 쌓입니다.**
+
+#### 레벨별 필요 누적 칼로리
+
+| 레벨 | 필요 누적 칼로리 | 대략 이 정도 운동 (30분 러닝 ≈ 300kcal 기준) |
+|---:|---:|---|
+| LV.2 | 100 kcal | 가벼운 산책 한 번 |
+| LV.5 | 547 kcal | 러닝 2회 |
+| LV.10 | 2,125 kcal | 러닝 7회 |
+| LV.20 | 10,247 kcal | 러닝 34회 |
+| LV.40 | 57,022 kcal | 러닝 190회 |
+| LV.50 | 100,633 kcal | 러닝 335회 |
+| LV.100 | 600,000 kcal | 러닝 2,000회 🏆 |
+
+```mermaid
+xychart-beta
+    title "레벨별 필요 누적 칼로리 (kcal)"
+    x-axis "레벨" [1, 10, 20, 40, 50, 70, 90, 100]
+    y-axis "누적 칼로리" 0 --> 600000
+    line [0, 2125, 10247, 57022, 100633, 238735, 456807, 600000]
+```
+
+#### 레벨 보상
+
+| 해제 레벨 | 보상 |
+|---:|---|
+| LV.1 | 기본 캐릭터, 한복 스킨 5종, 펫 '알' 🥚 |
+| LV.5 | 한복 스킨 4종 추가, 펫 '아기 용' 🐣 |
+| LV.10 | 펫 '성장한 용' 🐉 |
+| LV.20 | ROCK 스킨 (남·여) |
+| LV.40 | 펫 디자인 선택 (우심운까 · 핑크 용 · 파란 용) |
+| LV.50 | HIGHEND 스킨 (남·여) |
+
+| 알 (LV.1) | 아기 용 (LV.5) | 성장한 용 (LV.10) |
+| :---: | :---: | :---: |
+| <img src="frontend/static/assets/images/dragon/egg.png" width="110" alt="알" /> | <img src="frontend/static/assets/images/dragon/baby.png" width="110" alt="아기 용" /> | <img src="frontend/static/assets/images/dragon/dragon.png" width="110" alt="성장한 용" /> |
+
+<sub>코드: [`frontend/progression.py`](frontend/progression.py) · [`frontend/dragon.py`](frontend/dragon.py)</sub>
+
+### 7-7. 친구 방문
+
+```mermaid
+sequenceDiagram
+    actor A as 👤 나
+    participant S as ⚙️ 서버
+    actor B as 👤 친구
+
+    A->>S: 친구 코드 USIM-XXXXXX 조회
+    S-->>A: 친구 닉네임 · 레벨 확인
+    A->>S: 친구 요청 보내기
+    S-->>B: 요청 도착 (대기중)
+    B->>S: 수락 / 거절
+    S-->>A: 친구 목록에 추가 (양방향)
+    A->>S: 친구 운동방 방문
+    A->>S: 운동 한마디 남기기 (최대 60자)
+```
+
+### 7-8. 주요 API
+
+> **API** — 화면(브라우저)이 서버에게 "이거 해줘"라고 요청하는 **창구**입니다.
+
+| 메서드 · 경로 | 역할 |
+|---|---|
+| `GET /api/live-recommendations/` | 시설·환경 기반 추천 결과 |
+| `GET /api/account-state/` | 친구 코드·레벨·누적 운동량 |
+| `POST /api/workout-calories/` (`/undo/`, `/reset/`) | 칼로리 기록 · 되돌리기 · 초기화 |
+| `/api/friends/`, `/api/friends/lookup/`, `/api/friends/add/` | 친구 목록 · 코드 조회 · 추가 |
+| `/api/friend-requests/`, `/api/friend-requests/respond/` | 친구 요청과 응답 |
+| `/api/friend-notes/`, `/api/friend-notes/create/` | 운동 한마디 |
+| `/api/room-state/`, `/api/room-state/<member_id>/` | 내 방 · 친구 방 상태 |
+| `/api/dragon-character/` | 펫(용) 성장 단계 · 디자인 |
+| `POST /api/chatbot/`, `/api/chatbot/clear/` | AI 운동 코치 '우심이' · 대화 초기화 |
+| `GET /healthz/` | 서버 상태 확인 (배포 헬스체크) |
+
+---
+
+## 8. 수행결과(테스트·시연 페이지)
+
+### 8-1. 데이터 처리 결과
+
+#### 왜 정제가 필요할까? — 체육시설 원본 1,000건 샘플 점검
+
+(2026-09-29 실제 API 응답 기준)
+
+| 항목 | 건수 | 비율 |
+|---|---:|---:|
+| 정상운영 | 824 | 82.4% |
+| 폐업 | 172 | 17.2% |
+| 좌표 없음 | 60 | 6.0% |
+| 좌표 (0, 0) | 68 | 6.8% |
+| 실내외 미기재 | 163 | 16.3% |
+| 시설명+주소 중복 | 7 | 0.7% |
+
+```mermaid
+xychart-beta
+    title "체육시설 원본 1,000건 중 문제 데이터"
+    x-axis ["폐업", "실내외 미기재", "좌표 (0,0)", "좌표 없음", "중복"]
+    y-axis "건수" 0 --> 200
+    bar [172, 163, 68, 60, 7]
+```
+
+→ 원본을 그대로 쓰면 1,000곳 중 **약 13%는 거리 계산이 불가능**하고, **약 17%는 이미 문을 닫은 곳**입니다. **전처리와 품질검증이 필요한 이유**입니다.
+
+| API | 응답 상태 | 비고 |
+|---|---|---|
+| 전국체육시설 | `00 NORMAL` | 전체 153,605건 |
+| 기상청 초단기실황 | `00 NORMAL` | 12:00 기준 7개 항목 |
+| 에어코리아 | 정상 | 측정소 23곳 |
+
+#### 원본 → 표준 컬럼 변환 예시
+
+| 원본 필드 | 원본 값 | 표준 컬럼 | 변환 결과 |
+|---|---|---|---|
+| `faci_nm` | 스트롱라인 면목점 | `facility_name` | 스트롱라인 면목점 |
+| `ftype_nm` | 체력단련장 | `facility_type` | 헬스 |
+| `faci_lat` / `faci_lot` | "37.5932…" / "127.0930…" (문자) | `latitude` / `longitude` | 숫자 |
+| `inout_gbn_nm` | 실내 | `indoor_outdoor` | 실내 |
+
+#### 전체 파이프라인 결과 — 약 408만 건을 모아 약 401만 건을 정제 데이터로
+
+19개 데이터셋, **4,085,003건**을 수집해 정제 규칙에 따라 **78,468건(1.9%)을 제외**하고 **4,006,535건을 PROCESSED에 적재**했습니다.
+적재된 데이터 중 **337,369건(8.4%)** 은 버리지 않고 **"품질 확인 필요"** 표시를 붙여 보관했습니다.
+
+```mermaid
+flowchart LR
+    A["📥 수집<br/>4,085,003건<br/>19개 데이터셋"] --> B["🧹 정제 · 품질검증"]
+    B -->|"98.1%"| C[("🗄️ PROCESSED 적재<br/>4,006,535건")]
+    B -->|"1.9%"| D["🚫 제외<br/>78,468건<br/>중복 · 필수값 누락 · 폐업 등"]
+    C -.->|"그중 8.4%"| E["⚠️ 품질 확인 필요 표시<br/>337,369건<br/>삭제하지 않고 보관"]
+```
+
+> **"제외"와 "품질 확인 필요"는 다릅니다.**
+> - **제외** — 중복이거나 필수 정보가 없어 쓸 수 없는 행. 정제 단계에서 빠지고 적재되지 않습니다.
+> - **품질 확인 필요** — 쓸 수는 있지만 일부 값(예: 좌표, 측정값)이 비었거나 의심스러운 행. **지우지 않고 표시만** 해 두어, 나중에 확인·보완할 수 있게 했습니다.
+>
+> **건수 검산:** 4,085,003(수집) = 4,006,535(PROCESSED 반영) + 78,468(정제 과정 제외) — 모든 데이터셋에서 `수집 = 적재 + 제외`가 성립해, **설명되지 않고 사라진 행은 0건**입니다.
+
+#### 데이터셋별 수집·정제·품질검증 결과
+
+| 구분 | 데이터셋 | 수집 건수 | 정제 건수 | 품질 확인 필요 | 제외 건수 | DB 적재 건수 |
+|---|---|---:|---:|---:|---:|---:|
+| 🏛️ 시설 | 체육시설 (전국체육시설 API) | 153,605 | 106,521 | 0 | 47,084 | 106,521 |
+| 🏛️ 시설 | 공공체육시설 운영정보 | 7,334 | 7,331 | 0 | 3 | 7,331 |
+| 🌦️ 환경 | 초단기예보 | 198 | 198 | 0 | 0 | 198 |
+| 🌦️ 환경 | 초단기실황 | 24 | 24 | 0 | 0 | 24 |
+| 🌦️ 환경 | 대기질 (에어코리아) | 1,402 | 1,402 | 157 | 0 | 1,402 |
+| 🌦️ 환경 | 기상특보 | 186 | 128 | 0 | 58 | 128 |
+| 🌦️ 환경 | 기상특보 현황 | 1 | 0 | 0 | 1 | 0 |
+| 🛟 안전 | AED | 63,626 | 63,626 | 0 | 0 | 63,626 |
+| 🛟 안전 | 자전거 사고다발지역 | 5,046 | 5,046 | 0 | 0 | 5,046 |
+| 🚶 경로 | 두루누비 구간 | 139 | 139 | 0 | 0 | 139 |
+| 🚶 경로 | 두루누비 경로 | 4 | 4 | 0 | 0 | 4 |
+| 📚 문화빅데이터 | 전국체육시설 현황 | 152,968 | 140,224 | 1,598 | 12,744 | 140,224 |
+| 📚 문화빅데이터 | 전국공공체육시설 | 44,612 | 42,879 | 10,553 | 1,733 | 42,879 |
+| 📚 문화빅데이터 | 학교개방 체육시설 | 1,206 | 1,206 | 0 | 0 | 1,206 |
+| 📚 문화빅데이터 | 공공체육시설 프로그램 | 408,761 | 401,865 | 123,612 | 6,896 | 401,865 |
+| 📚 문화빅데이터 | 체육시설 인접 대중교통 | 1,639,279 | 1,639,279 | 201,449 | 0 | 1,639,279 |
+| 📚 문화빅데이터 | 체육시설 안전점검 | 192,314 | 182,365 | 0 | 9,949 | 182,365 |
+| 📚 문화빅데이터 | 체력 측정별 운동처방 | 25,070 | 25,070 | 0 | 0 | 25,070 |
+| 📚 문화빅데이터 | 위치기반 체력측정·운동처방 | 1,389,228 | 1,389,228 | 0 | 0 | 1,389,228 |
+| | **합계** | **4,085,003** | **4,006,535** | **337,369** | **78,468** | **4,006,535** |
+
+```mermaid
+pie showData
+    title PROCESSED 적재 4,006,535건 — 출처별 구성
+    "문화빅데이터 플랫폼 (8종)" : 3822116
+    "공공데이터포털 (11종)" : 184419
+```
+
+```mermaid
+xychart-beta
+    title "정제 과정에서 제외된 건수 (제외가 있었던 데이터셋)"
+    x-axis ["체육시설", "전국체육시설 현황", "안전점검", "프로그램", "전국공공체육시설", "기상특보", "운영정보", "특보 현황"]
+    y-axis "제외 건수" 0 --> 50000
+    bar [47084, 12744, 9949, 6896, 1733, 58, 3, 1]
+```
+
+#### 품질검사(DQ) 전·후
 
 | 검사 항목 | 검사 전 | 검사 후 | 처리 |
-| --- | ---: | ---: | --- |
+|---|---:|---:|---|
 | 전체 행 수 | 4,085,003건 | 4,006,535건 | 정제 규칙에 따라 78,468건 제외 |
 | 체육시설 행 수 | 153,605건 | 106,521건 | 47,084건 제외, 미설명 행 손실 0건 |
-| 기상특보 중복 | 186건 | 128건 | `(stnId, tmFc, tmSeq)` 기준 중복 58건 제외 |
+| 기상특보 중복 | 186건 | 128건 | (지점, 발표시각, 발표번호) 기준 중복 58건 제외 |
 | 기상특보 현황 | 1건 | 0건 | 활성·예비 특보가 아닌 1건 제외 |
 | AED 행 수 | 63,626건 | 63,626건 | 행 손실 0건 |
 | AED 빈 값 정규화 | 빈 문자열 등 33건 | NULL 33건 | 의미상 결측값을 NULL로 표준화 |
 | AED 자료형 변환 신규 NULL | 0건 | 0건 | 변환에 따른 값 손실 없음 |
 | AED Row Tracking 이상 | 0건 | 0건 | 누락·미확인·중복 ID 없음 |
 
-### 7.4 백엔드 구현·테스트
+> 🙋 **용어 풀이**
+> - **빈 값 정규화** — `""`, `" "`, `"-"`처럼 제각각인 "값 없음" 표기를 데이터베이스의 공식 빈 값인 `NULL` 하나로 통일하는 작업입니다. 그래야 "빈 값이 몇 개인지" 정확히 셀 수 있습니다.
+> - **자료형 변환 신규 NULL** — 문자 `"37.5"`를 숫자 `37.5`로 바꿀 때, 변환에 실패해 **새로 빈 값이 생기면** 데이터가 몰래 사라진 것입니다. 0건이면 변환 중 잃어버린 값이 없다는 뜻입니다.
+> - **Row Tracking** — 원본의 모든 행에 번호를 붙여, 정제 후에 **빠진 행 · 모르는 행 · 중복된 행**이 없는지 하나하나 대조하는 검사입니다.
+> - 기상특보 중복 기준 `(stnId, tmFc, tmSeq)` = (발표 지점, 발표 시각, 발표 번호)
 
-팀 DB의 DE 파이프라인과 별도로, 백엔드는 별도 데이터 등을 이용해 수집·처리·추천 로직을 구현하고 테스트했습니다. `frontend/collector.py`, `output/raw`, `pipeline/run_pipeline.py`, `pipeline/scheduler.py`, `logs/pipeline-YYYYMMDD.jsonl` 등의 내용은 DE 파이프라인의 설명과 합치지 않고 백엔드 구현·테스트 내용으로 구분합니다.
+![실제로 돌려 본 결과](docs/images/slides/08-result.png)
 
-실제 서비스 추천 흐름은 `사용자 지역 또는 현재 위치 → 시설 후보 조회 → 운동 종목 필터 → 거리·날씨·대기질 점수 계산 → 운영정보 확인 → 추천 카드와 지도 링크 → 운동량 기록`입니다. 현재 이동시간은 실제 대중교통 경로가 아닌 거리 기반 추정값입니다.
+#### 발견한 문제와 개선할 점
 
-### 7.5 추천 점수 산정 기준
+- 시설 API가 지역 조건을 무시해 첫 50건에 대상 지역이 없으면 0건 수집인데도 `CHECK_PASSED`로 기록됨 → **0건 수집을 검증 실패로 처리**
+- 좌표 (0, 0)을 유효 좌표로 통과시키지 않도록 검증 규칙 추가
+- 폐업 시설을 적재 전에 제외
+- 시설 API 지역 필터 보완 (페이지 순회)
+- 거리 기반 추정이 아닌 실제 대중교통 경로 시간 연동
+- 추천 → 운동 기록 전환율 측정
 
-현재 추천 시스템은 학습 모델이 아닌 규칙 기반 점수 계산 방식을 사용합니다. 추천 결과에 대한 설명이 가능하도록 거리·운동 종목·날씨·대기질·운영정보를 조합해 점수를 계산합니다.
+### 8-2. 기능 테스트
 
-![추천 점수 산정 예시](docs/images/slides/04-score.png)
+| 테스트 항목 | 확인 방법 | 기대 결과 |
+|---|---|---|
+| 프로필 지역 기준 추천 | 프로필 지역 저장 후 추천 요청 | 해당 시·군·구 시설만 표시 |
+| 선호 운동 기준 필터링 | 헬스만 선택 | 헬스 시설만 표시 |
+| 추천 점수순 정렬 | 추천 결과 확인 | 점수 높은 순, 동점이면 가까운 순 |
+| 거리·날씨·대기질 반영 | 추천 이유 확인 | "비가 와서 실내 시설 우선" 등 표시 |
+| API 실패 처리 | API 키 제거 후 실행 | 서비스는 유지, 오류 기록 |
+| 좌표 오류 처리 | 좌표 없는 시설 | 이동시간 `확인 필요`, 순위 후순위 |
+| 운동 칼로리 저장 | 300kcal 기록 | 누적 칼로리 +300 |
+| 입력값 검증 | 0 또는 문자 입력 | 저장 거부 메시지 |
+| 레벨업·보상 확인 | 547kcal 도달 | LV.5, 아기 용 · 한복 스킨 해제 |
+| 레벨 초기화 | 초기화 버튼 | LV.1, 0kcal, 기본 캐릭터 |
+| 최근 기록 되돌리기 | 되돌리기 버튼 | 마지막 기록만 차감 |
+| AI 챗봇 응답 | "오늘 어디서 운동할까?" | 추천 시설과 이유를 포함한 답변 |
+| 친구 방문·운동 한마디 | 친구 코드로 요청 → 수락 → 방문 | 친구 방 표시, 한마디 등록 |
+| 게스트 모드 | 게스트로 칼로리 기록 시도 | "보기만 가능" 안내 |
 
-| 평가 요소 | 반영 내용 |
-| --- | --- |
-| 거리 | 가까운 시설일수록 높은 점수 |
-| 운동 종목 | 사용자가 선택한 운동 종목과 시설 유형의 일치 여부 |
-| 강수 | 비가 오면 실외 시설 감점, 실내 시설 가점 |
-| 기온 | 실외 운동에 적합한 기온인지 판단 |
-| 습도·풍속 | 실외 운동에 불리한 환경이면 감점 |
-| 대기질 | 미세먼지가 높으면 실내 시설 우선 |
-| 운영정보 | 휴무·휴관 정보가 확인되면 점수 감점 |
+### 8-3. 서비스 시연 페이지
 
-기본 점수 계산은 다음과 같습니다.
+**배포 사이트:** [https://hkjfduhalihufsduahufahoiuw.onrender.com/](https://hkjfduhalihufsduahufahoiuw.onrender.com/)
 
-```text
-기본 점수 + 거리 점수 + 날씨·대기질 보정 점수 - 운영정보 보정 점수
+> 무료 Render 서버라 첫 접속 시 서버가 깨어나는 데 30초~1분 정도 걸릴 수 있습니다.
+
+```mermaid
+journey
+    title 우심운까 시연 시나리오
+    section 시작
+      운동방 입장: 5: 사용자
+      프로필 지역·선호 운동 확인: 4: 사용자
+    section 추천
+      운동 장소 추천: 5: 사용자
+      점수·거리·날씨 확인: 4: 사용자
+      운영·휴무 정보 확인: 4: 사용자
+      우심이에게 질문: 5: 사용자, 우심이
+    section 기록과 보상
+      운동 칼로리 기록: 5: 사용자
+      레벨·보상 확인: 5: 사용자
+      운동방 꾸미기: 5: 사용자
+    section 함께
+      친구 운동방 방문: 5: 사용자, 친구
 ```
 
-거리 점수는 다음 기준을 사용합니다.
+#### ① 메인 운동방 — 추억을 떠올리게 하는 나만의 공간
 
-```text
-거리 점수 = max(0, 40 - 거리(km) × 18)
-```
-
-환경 조건은 다음과 같이 보정합니다.
-
-- 강수 중 실외 시설: `-24점`
-- 강수 중 실내 시설: `+8점`
-- 실외 기온 5도 미만 또는 30도 초과: `-10점`
-- 실외 기온 10~25도: `+6점`
-- 실외 습도 80% 이상: `-8점`
-- 실외 습도 40~70%: `+4점`
-- 실외 풍속 8m/s 이상: `-8점`
-- 미세먼지가 높고 실내 시설: `+14점`
-- 대기질이 양호하고 실외 시설: `+5점`
+캐릭터와 가구를 드래그해 꾸미고, 오늘의 추천·칼로리 기록·친구 한마디를 한 화면에서 봅니다.
 
-최종 점수는 0~99점 범위로 제한합니다. 점수는 임의의 값이 아니라 실제 거리와 공공데이터 기반 환경 조건을 조합한 결과이며, 추천 카드에 점수 산정 이유를 함께 표시합니다.
+![운동방 홈 화면](docs/images/01-home.png)
 
-### 7.6 장소 추천 과정
+#### ② 프로필 — 기본 운동 지역과 선호 운동 설정
 
-사용자가 지역과 운동 종목을 선택하면 다음 순서로 추천 장소를 생성합니다.
+닉네임, 한 줄 소개, 기본 운동 지역, 선호 종목과 이동 방식을 설정합니다.
 
-```text
-지역·운동 종목·최대 이동시간 확인
-        ↓
-사용자 GPS 또는 선택 지역 중심 좌표 결정
-        ↓
-시설 데이터베이스에서 후보 조회
-        ↓
-시설명·시설 유형을 기준으로 운동 종목 분류
-        ↓
-선택 운동 종목과 일치하지 않는 시설 제외
-        ↓
-시설까지의 거리 계산 및 최대 이동시간 필터링
-        ↓
-날씨·대기질·실내외 조건으로 점수 보정
-        ↓
-운영·휴무 정보 확인
-        ↓
-점수순·거리순 정렬 후 상위 시설 표시
-```
+![프로필과 운동 취향 설정 화면](docs/images/06-profile.png)
 
-시설명과 시설 유형의 키워드를 기준으로 운동 종목을 분류합니다. 예를 들어 헬스장·피트니스·체육관은 헬스, 수영장은 수영, 공원·운동장·축구장·풋살장은 러닝, 자전거·사이클은 자전거 후보로 분류합니다.
+#### ③ 추천 조건 — 지역·운동 종목·이동시간 입력
 
-현재 이동시간은 실제 대중교통 경로가 아닌 거리 기반 추정값입니다.
+프로필의 기본 지역과 선호 종목을 불러오고, 오늘의 조건만 바꿔서 찾습니다.
 
-```text
-예상 이동시간(분) = 거리(km) × 20
-```
+![운동 추천 조건 입력 화면](docs/images/02-recommend.png)
 
-따라서 추천 화면에서는 실제 경로 시간이 아니라 거리 기반 예상값임을 전제로 표시합니다.
+#### ④ 추천 결과 — 거리와 환경 조건이 추천 이유로
 
-추천 결과에는 시설명, 주소, 거리, 예상 이동시간, 실내·실외 여부, 환경정보, 추천 점수, 추천 이유, 운영정보와 지도 링크를 함께 제공합니다.
+시설별 점수, 예상 이동시간, 추천 이유와 운영 공지를 확인하고 카카오맵으로 이동합니다.
 
-### 7.7 운영정보 크롤링
+![운동 장소 추천 결과 화면](docs/images/03-recommend-results.png)
 
-시설 기본정보와 API 데이터만으로는 추천 시점의 임시 휴무나 운영 공지를 알기 어렵습니다. 그래서 추천 요청 시점에 상위 후보의 공개 운영 페이지를 Selenium으로 확인하고, 휴무·휴관·운영 중단과 같은 문구가 발견되면 해당 시설의 점수를 감점한 뒤 다시 정렬합니다.
+#### ⑤ AI 챗봇 — 우심이에게 물어보기
 
-이 크롤링은 시설을 새로 수집하는 주기 파이프라인과 구분되는 보완 단계입니다. 운영 여부를 완벽하게 판정한다고 표현하기보다, 기본정보만으로 확인하기 어려운 당일 공지를 보완해 사용자의 헛걸음 가능성을 줄이는 목적입니다.
+<!-- TODO: 챗봇 화면 캡처 추가 → docs/images/07-chatbot.png -->
+![AI 운동 코치 우심이 화면](docs/images/07-chatbot.png)
 
-![운영정보 크롤링](docs/images/slides/06-crawling.png)
+#### ⑥ 운동 기록 — 기록하면 방이 채워진다
 
-### 7.8 DB 결과가 없을 때의 보완
+![운동 기록 화면](docs/images/04-diary.png)
 
-공공데이터 기반 시설 DB에 조건에 맞는 시설이 없으면 DB와 백업 CSV를 먼저 모두 확인합니다. 그래도 결과가 없을 때만 카카오 장소 검색 API를 임시 후보로 사용합니다.
+#### ⑦ 레벨·보상 — 레벨업과 아이템 해제
 
-- 외부 검색 결과에는 `DB에 일치 시설이 없어 외부 장소 검색으로 보완`이라는 이유 표시
-- 외부 검색 결과는 공공데이터 시설과 구분
-- 외부 검색 결과는 DB에 저장하지 않고 현재 요청에만 사용
-- 운영정보가 확인되지 않는 시설은 `확인 필요`로 표시
+<!-- TODO: 레벨업 / 보상 해제 화면 캡처 추가 → docs/images/08-levelup.png -->
+![레벨업과 보상 해제 화면](docs/images/08-levelup.png)
 
-### 7.9 AI 운동 코치 ‘우심이’
+#### ⑧ 운동방 꾸미기 — 캐릭터 스킨과 가구 배치
 
-AI 챗봇은 사용자가 운동을 시작하기 전의 망설임을 줄이고, 추천 결과를 이해하도록 돕는 서비스 기능입니다. 단순한 일반 대화형 챗봇이 아니라 사용자의 프로필과 운동 조건, 최근 운동량, 추천 결과를 참고해 답변합니다.
+<!-- TODO: 꾸미기 패널 화면 캡처 추가 → docs/images/09-customize.png -->
+![운동방 꾸미기 화면](docs/images/09-customize.png)
 
-```text
-사용자 질문
-    ↓
-브라우저의 챗봇 UI
-    ↓ POST /api/chatbot/
-Django chatbot_views.py
-    ↓
-사용자 프로필·최근 운동량·추천 데이터 정리
-    ↓
-OpenAI Responses API
-    ↓
-우심이의 한국어 답변과 추천 카드
-```
+#### ⑨ 친구 방문 — 나의 공간을 친구와 나누기
 
-예를 들어 사용자가 “오늘 러닝해도 괜찮을까?”라고 질문하면, 우심이는 사용자의 지역·운동 취향을 확인하고 추천 데이터가 있으면 날씨·대기질·거리·추천 이유를 함께 설명합니다. “10분 스트레칭을 알려줘”처럼 추천 데이터가 필요하지 않은 질문에는 운동 습관과 안전을 고려한 일반적인 안내를 제공합니다.
+친구 코드로 친구를 맺고, 친구의 운동방에 놀러 가 한마디를 남깁니다.
 
-챗봇의 대화 이력은 Django 세션에 제한된 개수만 저장하며, OpenAI API 키는 브라우저에 전달하지 않고 Django 서버에서만 사용합니다. API 키가 없거나 AI 응답이 실패하면 오류 메시지를 반환하고, 추천 데이터가 일시적으로 조회되지 않아도 실시간 상태를 임의로 만들어 답변하지 않습니다. 통증·부상·호흡곤란·흉통처럼 의료 위험 신호가 포함된 질문에는 운동을 중단하고 전문가의 평가를 받도록 안내합니다.
+![친구 코드 조회와 운동 한마디 화면](docs/images/05-friends.png)
 
-### 7.10 실패 및 예외 처리
+<!-- TODO: 친구 운동방 방문 화면 캡처 추가 → docs/images/10-friend-room.png -->
+![친구 운동방 방문 화면](docs/images/10-friend-room.png)
 
-| 예외 상황 | 처리 방법 |
-| --- | --- |
-| 기상청·에어코리아 API 장애 | 최대 3회 재시도 후 DB의 최신 데이터 사용 |
-| API 응답이 JSON이 아님 | 응답 일부와 요청 URL을 로그로 저장 |
-| API 키 누락 | 수집 중단 후 필요한 환경변수 이름 기록 |
-| DB 연결 실패 | 백업 CSV 또는 외부 API로 보완하고 DB 오류 기록 |
-| 시설 좌표 누락 | 거리 계산에서 제외하거나 `확인 필요`로 표시 |
-| 잘못된 좌표 형식 | 적재 전 오류 행으로 분리하고 원본 보존 |
-| 지역 시설 검색 결과 없음 | 카카오 장소 검색으로 임시 후보 보완 |
-| 운영정보 확인 실패 | 시설은 유지하고 운영정보를 `확인 필요`로 표시 |
-| 사용자 위치 권한 거부 | 선택 지역 중심 좌표로 대체 |
-| 날씨·대기질 데이터 없음 | 해당 조건을 점수에서 제외하고 상태 기록 |
-| 스케줄러 실행 실패 | 실행 시각·실패 원인·수집·적재 건수 기록 |
-
-확인할 수 없는 값을 임의로 생성하지 않습니다. 거리·날씨·대기질·운영정보가 없으면 `NULL`, `확인 필요`, `데이터 없음`으로 표시해 추천 결과의 신뢰성을 유지합니다.
-
-![예외 처리 기준](docs/images/slides/07-exception.png)
-
-### 7.11 설계 과정에서의 고민과 결정
-
-#### 최신 데이터와 안정적인 응답 사이의 균형
-
-외부 API를 추천 요청마다 호출하면 최신 데이터는 얻을 수 있지만 API 장애와 응답 지연에 취약합니다. 반대로 DB 데이터만 사용하면 응답은 안정적이지만 최신성이 떨어질 수 있습니다. 따라서 DB의 최신 데이터를 우선 사용하고, 데이터가 없거나 조회에 실패할 때만 외부 API를 호출하는 구조를 선택했습니다.
-
-#### 공공데이터와 외부 검색 데이터의 구분
-
-공공 체육시설 데이터는 대회 평가 근거와 데이터 신뢰성을 위해 우선 사용합니다. 다만 특정 지역의 시설 데이터가 누락될 수 있어 결과가 전혀 없을 때만 카카오 장소 검색을 보완적으로 사용합니다. 외부 검색 결과는 공공데이터와 구분하고 DB에 영구 저장하지 않습니다.
-
-#### 거리 데이터가 없을 때의 처리
-
-좌표가 없는 시설을 모두 삭제하면 실제 시설 정보가 사라질 수 있습니다. 따라서 좌표가 없는 시설은 `확인 필요` 상태로 남기고 거리 기반 정렬에서는 후순위로 처리했습니다.
-
-#### 모델 기반 추천과 규칙 기반 추천
-
-이번 프로젝트에서는 추천 결과를 사용자가 이해할 수 있어야 하므로 규칙 기반 점수 계산을 선택했습니다. 추천 카드에 거리, 기온, 강수, 대기질, 운영정보를 근거로 표시할 수 있고, 데이터가 부족할 때 어떤 조건이 적용되지 않았는지도 확인할 수 있습니다.
-
-#### 웹 서비스와 데이터 파이프라인 분리
-
-기존 웹 서비스 전체가 아니라 이번 단위 프로젝트의 수집·전처리·검증·적재·스케줄링 과정을 명확히 평가할 수 있도록 데이터 파이프라인을 서비스 코드와 분리했습니다. 이후 적재된 공공데이터는 추천 기능에서 사용할 수 있도록 연결했습니다.
-
-## 8. 수행 결과
-
-파이프라인이 실제로 동작했는지는 원본·정제 데이터의 행 수, DQ 처리 결과, DB 적재 건수와 실행 로그로 확인합니다. 서비스가 사용자 경험으로 이어지는지는 운동방에서 추천을 받고, 운동을 기록하고, 보상과 친구 방문으로 이어지는 화면 흐름으로 확인합니다.
-
-![파이프라인 실행 결과](docs/images/slides/08-result.png)
-
-| 화면 | 설명 |
-| --- | --- |
-| HOME | 누적 운동량, 운동방, 오늘의 추천 진입 |
-| MOVE | 지역·운동 종목·이동 조건 입력 |
-| RESULT | 시설·거리·추천 이유·운영정보 확인 |
-| AI COACH | 우심이에게 운동 질문을 하고 추천 이유 확인 |
-| DIARY | 날짜별 운동 기록 확인 |
-| FRIEND | 친구 조회와 운동 한마디 |
-| PROFILE | 운동 지역·종목·캐릭터 설정 |
-
-### 서비스 시연 화면
-
-#### HOME: 운동방과 오늘의 운동 진입
-
-![HOME 운동방](docs/images/01-home.png)
-
-#### MOVE: 추천 조건 입력
-
-![운동 추천 조건](docs/images/02-recommend.png)
-
-#### RESULT: 추천 장소와 추천 이유 확인
-
-![운동 장소 추천 결과](docs/images/03-recommend-results.png)
-
-#### DIARY: 운동 기록과 누적 보상
-
-![운동 기록](docs/images/04-diary.png)
-
-#### FRIEND: 친구 방문과 운동 한마디
-
-![친구 방문](docs/images/05-friends.png)
-
-#### PROFILE: 기본 운동 지역·선호 운동·캐릭터 설정
-
-![프로필 설정](docs/images/06-profile.png)
-
-### 테스트 및 시연 순서
-
-1. 로컬 서버를 실행하고 시작 화면을 엽니다.
-2. 게스트 체험 또는 회원가입으로 운동방에 들어갑니다.
-3. 지역과 운동 종목을 선택해 추천을 요청합니다.
-4. 추천 카드의 거리·환경 정보와 지도 링크를 확인합니다.
-5. AI 코치 우심이에게 오늘 운동이나 추천 결과에 대해 질문합니다.
-6. 운동 칼로리를 기록하고 운동방 보상 변화를 확인합니다.
-7. 파이프라인 명령을 실행해 `output/`과 `logs/`의 건수를 확인합니다.
-
-실제 테스트 건수와 평균 응답시간은 실행 환경과 API 응답에 따라 달라지므로 실행 후 로그에 기록된 값을 발표자료에 옮겨 적습니다. 임의의 성공률이나 응답시간은 기재하지 않았습니다.
-
-### 8.1 데이터 엔지니어링 파이프라인 참고
-
-데이터 엔지니어링 파이프라인의 상세 수집 방식, 데이터 품질검증, 장애 복구, 스케줄링·모니터링·알림 운영은 3차 수정된 데이터 파이프라인 README를 참고합니다. 이 팀 README에서는 RAW → 정제·DQ → PROCESSED 구조와 백엔드 연결만 요약합니다.
-
-### 8.2 백엔드 구현·테스트 참고
-
-아래 항목은 팀 DB의 DE 파이프라인이 아니라 백엔드에서 별도 데이터로 구현·테스트한 내용입니다.
-
-- `frontend/collector.py`: 별도 데이터 수집·정규화와 JSON·CSV 출력
-- `output/raw`: 백엔드 수집 테스트 원본 결과
-- `pipeline/run_pipeline.py`, `pipeline/scheduler.py`: 별도 수집·처리 실행 및 스케줄 테스트 코드
-- `logs/pipeline-YYYYMMDD.jsonl`: 별도 실행 로그 예시
-- `frontend/recommendation_service.py`: 시설·환경 데이터 기반 추천 로직
-
-현재 저장소의 수집기와 추천 코드는 서비스 백엔드의 동작 및 테스트를 설명하기 위한 것이며, 데이터 엔지니어링 파이프라인의 운영 산출물과 동일한 것으로 보지 않습니다.
-
-실행 로그 한 줄에는 `run_id`, `started_at`, `finished_at`, `region`, `collected_count`, `normalized_count`, `loaded_count`, `quality_status`, `errors`를 기록합니다. DB 적재를 사용하지 않은 실행은 `loaded_count: 0`, `load_status: skipped`로 명확히 표시합니다.
-
-### 8.3 실행 방법
-
-### 설치
+<details>
+<summary><strong>🛠️ 로컬 실행 방법 (개발자용) 펼쳐보기</strong></summary>
 
 ```bash
-git clone https://github.com/encore-ai-campus/mlo-02-p1-team3.git
-cd mlo-02-p1-team3
-python -m venv .venv
-source .venv/bin/activate  # Windows: .venv\\Scripts\\activate
+git clone https://github.com/2nd-MLOps-engineer/hkjfduhalihufsduahufahoiuw.git
+cd hkjfduhalihufsduahufahoiuw
+python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
-```
-
-`.env.example`을 `.env`로 복사하고 공공데이터 API 키와 DB 설정을 입력합니다.
-
-```bash
-cp .env.example .env
+cp .env.example .env   # API 키와 DATABASE_URL 입력
 python manage.py migrate
 python manage.py runserver
 ```
 
-명령 실행 후 Django 개발 서버가 안내하는 주소로 접속합니다.
+- 추천 기능에는 PostGIS와 시설·날씨·대기질 정제 테이블 데이터가 필요합니다. `migrate`는 회원·운동량 등 Django 테이블만 만듭니다.
+- 필요한 환경변수: `DATABASE_URL`, `KAKAO_REST_API_KEY`, `KAKAO_JAVASCRIPT_KEY`, `KMA_SERVICE_KEY`, `AIRKOREA_SERVICE_KEY`, `FACILITY_API_URL`, `FACILITY_SERVICE_KEY`, `OPENAI_API_KEY`(챗봇)
+- 수집 테스트: `python frontend/collector.py --region "서울특별시 관악구" --limit 50`
+- 시설 누락값 보완 리포트: `python manage.py enrich_facilities --limit 100` (`--apply`를 줄 때만 DB 반영)
 
-### 수집기 단독 실행
+</details>
 
-```bash
-python frontend/collector.py --region "서울특별시 강남구" --limit 50
-python frontend/collector.py --region "서울특별시 강남구" --limit 50 --enrich-web
-```
-
-### 평가용 파이프라인 실행
-
-```bash
-python pipeline/run_pipeline.py --region "서울특별시 강남구" --limit 50
-python pipeline/run_pipeline.py --region "서울특별시 강남구" --limit 50 --load-db
-```
-
-실행 후 로그에서 수집·정제·적재 건수를 확인합니다.
+---
 
 ## 9. 한 줄 회고
 
-**신경호** — 사용자가 데이터의 출처와 추천 이유를 화면에서 이해하도록 만드는 일이 중요하다는 것을 배웠습니다.
+| | 팀원 | 회고 |
+|:---:|---|---|
+| <img src="https://github.com/Shinkyeongho.png" width="48" alt="신경호" /> | **신경호** | 사용자 경험을 고려한 프론트엔드 구현과 UI 설계, 발표자료 구성을 함께 수행하며 기술적 완성도뿐 아니라 서비스의 가치를 명확히 전달하는 역량의 중요성을 체감했습니다. |
+| <img src="https://github.com/baikAnalyst.png" width="48" alt="백선영" /> | **백선영** | 여러 공공데이터를 하나의 서비스로 연결하는 과정에서, 데이터 수집뿐만 아니라 정제·품질검증·운영까지 함께 설계하는 것이 중요하다는 것을 깨달았고, 직접 구현하며 많이 배우고 성장할 수 있었습니다. |
+| <img src="https://github.com/kimhyounjun.png" width="48" alt="김형준" /> | **김형준** | 다양한 데이터를 하나의 데이터베이스로 통합하고 서버를 구축해 실제 운영 가능한 웹 서비스로 완성한 과정은, 데이터와 서비스를 연결하는 역량을 키운 값진 경험이었습니다. |
+| <img src="https://github.com/callijee22-ship-it.png" width="48" alt="류지예" /> | **류지예** | 단순히 하나의 화면을 완성하는 것이 얼마나 많은 생각이 오가는 것인지를 배웠습니다. 일상 속에서 너무나 당연하게 여겨왔던 것들에 정말 많은 수고와 노력이 숨어있음을 깨닫게 되어 정말 뜻깊은 시간이 되었습니다. |
 
-**류지예** — 기능을 많이 넣는 것보다 사용자가 다음 행동으로 자연스럽게 이어지는 흐름을 다듬는 일이 중요했습니다.
+---
 
-**백선영** — 행 수만 맞는 것으로는 데이터 품질을 보장할 수 없어 원본과 변환 전후 값을 함께 추적해야 한다는 것을 배웠습니다.
+## 📖 용어 사전
 
-**김형준** — 화면 기능과 데이터 파이프라인을 분리하면서도 실행 결과가 하나의 사용자 경험으로 이어지도록 설계하는 과정을 경험했습니다.
+| 용어 | 쉬운 설명 |
+|---|---|
+| **API** | 프로그램끼리 정보를 주고받는 창구. "기상청아, 지금 관악구 날씨 알려줘" 같은 요청을 보내는 곳 |
+| **공공데이터** | 정부·공공기관이 누구나 쓸 수 있도록 공개한 데이터 (체육시설 목록, 날씨, 미세먼지 등) |
+| **프론트엔드** | 사용자가 보는 화면 부분 |
+| **백엔드** | 화면 뒤에서 계산·저장을 담당하는 서버 부분 |
+| **Django** | 파이썬으로 웹 서비스의 백엔드를 만드는 도구 |
+| **데이터베이스 (PostgreSQL)** | 정보를 표 형태로 저장하는 창고 |
+| **PostGIS** | 데이터베이스에서 "두 지점 사이 거리"같은 지도 계산을 할 수 있게 해 주는 확장 기능 |
+| **좌표 (위도·경도)** | 지구 위의 위치를 숫자로 나타낸 것 (예: 37.59, 127.09) |
+| **RAW / PROCESSED** | RAW = 받은 그대로의 원본, PROCESSED = 깨끗하게 정리한 데이터 |
+| **전처리 (Cleaning)** | 제각각인 이름·형식을 통일하고 잘못된 값을 정리하는 작업 |
+| **품질검증 (DQ, Data Quality)** | 빠진 값·중복·말이 안 되는 값이 없는지 검사하는 작업 |
+| **파이프라인** | 수집 → 정제 → 검증 → 저장을 자동으로 이어 붙인 흐름 |
+| **크롤링** | 프로그램이 공개 웹페이지의 내용을 자동으로 읽어 오는 것 |
+| **robots.txt** | 웹사이트가 "자동 프로그램은 여기까지만 들어와 주세요"라고 적어 둔 안내문 |
+| **규칙 기반 추천** | 사람이 정한 기준(점수표)으로 순위를 매기는 방식. AI 학습 없이도 이유를 설명할 수 있음 |
+| **ERD** | 데이터베이스 표들과 그 관계를 그린 설계도 |
+| **환경변수** | 비밀번호·API 키처럼 코드에 직접 쓰면 안 되는 값을 서버에 따로 보관하는 방법 |
+| **해시 (Hash)** | 비밀번호를 원래대로 되돌릴 수 없는 값으로 바꿔 저장하는 방식 |
+| **배포 (Render)** | 내 컴퓨터에서만 돌던 서비스를 인터넷 서버에 올려 누구나 접속하게 하는 것 |
+| **OpenAI API** | ChatGPT를 만든 회사의 AI를 우리 서비스 안에서 쓸 수 있게 해 주는 창구 |
 
-### 라이선스와 주의사항
+---
 
-- API 키, DB 비밀번호, 개인 위치정보를 저장소에 커밋하지 않습니다.
-- 공개 웹 페이지 확인은 `robots.txt`와 제공기관 정책을 준수합니다.
-- 화면 캡처의 시설·운영정보·추천 점수는 실행 시점의 결과와 다를 수 있습니다.
+<div align="center">
+
+**예전에는 내 방을 꾸미려고 접속했다면,<br>이제는 운동으로 내 방을 채우는 경험을 만들고 싶었습니다.**
+
+우심운까 · TEAM MOTIVE
+
+</div>
