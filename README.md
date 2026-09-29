@@ -88,9 +88,9 @@ woosimwoonkka-web/
 - [6. ERD](#6-erd)
 - [7. 주요 프로시저](#7-주요-프로시저)
 - [8. 수행 결과](#8-수행-결과)
-- [9. 자동 학습 데이터 파이프라인 평가 증빙](#9-자동-학습-데이터-파이프라인-평가-증빙)
-- [10. 실행 방법](#10-실행-방법)
-- [11. 한 줄 회고](#11-한-줄-회고)
+- [8.1 데이터 엔지니어링 파이프라인 참고](#81-데이터-엔지니어링-파이프라인-참고)
+- [8.3 실행 방법](#83-실행-방법)
+- [9. 한 줄 회고](#9-한-줄-회고)
 
 ## 1. 팀 소개
 
@@ -124,8 +124,8 @@ woosimwoonkka-web/
     </tr>
     <tr height="88" valign="middle">
       <td align="center" nowrap="nowrap"><b>백선영</b></td>
-      <td>데이터 수집 · 데이터베이스 파이프라인</td>
-      <td>공공데이터 수집, 전처리, 품질검증, 데이터 파이프라인 구축</td>
+      <td>서비스 기획 · 데이터 엔지니어링</td>
+      <td>서비스 기획, 공공데이터 조사·선정, 데이터 수집·정제·품질검증, PostgreSQL 데이터 파이프라인 구축, 스케줄링·모니터링·알림 자동화</td>
       <td><a href="https://github.com/baikAnalyst">baikAnalyst</a></td>
     </tr>
     <tr height="88" valign="middle">
@@ -413,17 +413,29 @@ DB에 저장된 환경 데이터는 수집 시각 또는 측정 시각이 가장
 
 ## 7. 주요 프로시저
 
-### 7.1 수집·전처리·적재
+### 7.1 데이터 파이프라인
+
+서비스에 필요한 공공데이터는 API 및 Selenium 크롤링으로 수집하고, PostgreSQL에서 원본과 정제 데이터를 분리하여 관리합니다.
 
 ```text
-1. 지역과 실행 시각을 확인한다
-2. 체육시설·기상·대기질 API를 호출하고 재시도한다
-3. API 원문을 output/raw에 저장한다
-4. 시설 필드를 표준 이름과 문자열·좌표 형식으로 변환한다
-5. 필수 키·행 수·중복·NULL 변화를 검증한다
-6. 검증 통과 결과만 PostgreSQL에 적재한다
-7. 수집·정제·적재 건수와 오류를 JSON Lines 로그에 기록한다
+공공데이터 API / Selenium 크롤링
+                ↓
+          PostgreSQL RAW
+                ↓
+    Cleaning / Transformation
+                ↓
+           Data Quality
+                ↓
+       PostgreSQL PROCESSED
+                ↓
+              Backend
 ```
+
+파이프라인은 데이터 수집·정제·품질검증·적재를 자동화하고, APScheduler를 이용해 데이터셋별 주기로 실행합니다. 실행 이력과 DQ 결과는 로그 및 `monitoring.pipeline_run_history`에 기록하며, 실패·이상 발생 시 팀 Discord 채널로 알림을 전송합니다. 세부 수집 방식, 데이터 품질검증, 장애 복구 및 운영 구조는 3차 수정된 데이터 파이프라인 README를 참고합니다.
+
+### 7.2 백엔드 구현·테스트
+
+팀 DB의 DE 파이프라인과 별도로, 백엔드는 별도 데이터 등을 이용해 수집·처리·추천 로직을 구현하고 테스트했습니다. `frontend/collector.py`, `output/raw`, `pipeline/run_pipeline.py`, `pipeline/scheduler.py`, `logs/pipeline-YYYYMMDD.jsonl` 등의 내용은 DE 파이프라인의 설명과 합치지 않고 백엔드 구현·테스트 내용으로 구분합니다.
 
 실제 서비스 추천 흐름은 `사용자 지역 또는 현재 위치 → 시설 후보 조회 → 운동 종목 필터 → 거리·날씨·대기질 점수 계산 → 운영정보 확인 → 추천 카드와 지도 링크 → 운동량 기록`입니다. 현재 이동시간은 실제 대중교통 경로가 아닌 거리 기반 추정값입니다.
 
@@ -580,81 +592,25 @@ DB에 저장된 환경 데이터는 수집 시각 또는 측정 시각이 가장
 
 실제 테스트 건수와 평균 응답시간은 실행 환경과 API 응답에 따라 달라지므로 실행 후 로그에 기록된 값을 발표자료에 옮겨 적습니다. 임의의 성공률이나 응답시간은 기재하지 않았습니다.
 
-### 8.1 자동 학습 데이터 파이프라인 평가 증빙
+### 8.1 데이터 엔지니어링 파이프라인 참고
 
-### 평가 유의사항
+데이터 엔지니어링 파이프라인의 상세 수집 방식, 데이터 품질검증, 장애 복구, 스케줄링·모니터링·알림 운영은 3차 수정된 데이터 파이프라인 README를 참고합니다. 이 팀 README에서는 RAW → 정제·DQ → PROCESSED 구조와 백엔드 연결만 요약합니다.
 
-- 팀별 주제와 사용한 프레임워크·라이브러리는 서로 다를 수 있으므로, 구현 방식의 차이는 점수에 반영하지 않고 산출물과 실행 결과(로그·캡처·시연)로 평가합니다.
-- 공모전용으로 기존에 구축한 웹 서비스 코드는 평가 대상에서 제외하고, 이번 단위 프로젝트에서 구현한 수집·전처리·적재·스케줄링 부분만 평가합니다.
-- README에 실행 방법, 스케줄 설정, 로그 위치, 적재 결과(수집·적재 건수)를 기재하여 평가 근거로 제출합니다.
+### 8.2 백엔드 구현·테스트 참고
 
-### Repository Description
+아래 항목은 팀 DB의 DE 파이프라인이 아니라 백엔드에서 별도 데이터로 구현·테스트한 내용입니다.
 
-권장 Repository Description은 다음과 같습니다.
+- `frontend/collector.py`: 별도 데이터 수집·정규화와 JSON·CSV 출력
+- `output/raw`: 백엔드 수집 테스트 원본 결과
+- `pipeline/run_pipeline.py`, `pipeline/scheduler.py`: 별도 수집·처리 실행 및 스케줄 테스트 코드
+- `logs/pipeline-YYYYMMDD.jsonl`: 별도 실행 로그 예시
+- `frontend/recommendation_service.py`: 시설·환경 데이터 기반 추천 로직
 
-```text
-공공데이터 기반 운동 장소 추천 서비스의 자동 학습 데이터 파이프라인
-```
-
-Repository 이름에는 프로젝트명을 넣지 않고, 프로젝트 설명은 GitHub Repository Description에 작성합니다. 프로젝트명이 확정되지 않은 경우 임시 설명을 작성한 뒤 확정 후 수정합니다.
-
-### 필수 산출물
-
-1. 데이터 수집·전처리 파이프라인 명세서
-2. 기초 데이터셋과 품질검증 결과
-3. 웹 크롤링 또는 API 수집 코드
-4. 파이프라인 스케줄링 코드와 실행 로그
-
-### 평가 범위
-
-- 기존 웹 서비스 화면과 기존 공모전용 코드는 서비스 시연 참고 자료입니다.
-- 이번 단위 프로젝트의 평가 대상은 수집, 전처리, 적재, 스케줄링, 로그, 적재 결과입니다.
-- 팀별 프레임워크·라이브러리가 달라도 구현 방식보다 실행 결과와 증빙을 기준으로 확인합니다.
-
-### 데이터 출처와 활용
-
-| 출처 | 주요 데이터 | 서비스 활용 | 결과 위치 |
-| --- | --- | --- | --- |
-| 전국체육시설 API | 시설명, 유형, 주소, 좌표, 운영정보 | 운동시설 후보와 거리 계산 | `output/facilities.csv`, DB |
-| 기상청 API | 기온, 습도, 강수, 풍속 | 실외 운동 적합도 | `output/raw/weather.json`, DB |
-| 에어코리아 API | PM10, PM2.5, 측정소, 측정시각 | 실내·실외 우선순위 | `output/raw/air.json`, DB |
-| 공개 시설 페이지 | 휴무·운영시간 문구 | 추천 카드의 운영정보 보완 | `output/facility_enrichment/` |
-
-### 품질검증 기준
-
-| 검사 | 기준 | 실패 시 조치 |
-| --- | --- | --- |
-| Row count | 원본·정제·적재 건수 차이를 기록 | 차이 원인을 리포트에 기록 |
-| Key uniqueness | 시설 식별자 또는 시설명·주소 조합 중복 확인 | 중복 행 격리 |
-| Required fields | 시설명·주소·지역 필수 | 누락 건은 적재 전 분리 |
-| Type validation | 위도·경도·수치·일시 형식 확인 | 원본 보존 후 오류 로그 기록 |
-| NULL transition | 원본 값이 전처리 후 NULL이 되었는지 확인 | 변환 규칙 또는 원본 값 검토 |
-| API status | HTTP·응답 구조·요청 시각 기록 | 재시도 후 실패 로그 저장 |
-
-검증 기준과 실행 결과는 이 README의 평가 증빙 항목과 실행 로그를 기준으로 정리합니다.
-
-### 스케줄 설정
-
-```bash
-python pipeline/run_pipeline.py --region "서울특별시 강남구" --limit 50
-python pipeline/scheduler.py --region "서울특별시 강남구" --interval-hours 6
-```
-
-운영 환경에서는 API 호출량과 제공기관 이용정책을 확인한 뒤 주기를 조정합니다. 스케줄러는 실행마다 동일한 파이프라인을 호출하고 이전 실행의 로그와 결과 파일을 덮어쓰지 않습니다.
-
-### 로그와 적재 결과
-
-| 항목 | 위치 |
-| --- | --- |
-| 원본 API 응답 | `output/raw/*.json` |
-| 정제 결과 | `output/facilities_normalized.json`, `output/facilities.csv` |
-| 시설 보완 리포트 | `output/facility_enrichment/report_*.json`, `report_*.csv` |
-| 파이프라인 실행 로그 | `logs/pipeline-YYYYMMDD.jsonl` |
-| 품질검증 설명 | `docs/assessment/data-quality.md` |
+현재 저장소의 수집기와 추천 코드는 서비스 백엔드의 동작 및 테스트를 설명하기 위한 것이며, 데이터 엔지니어링 파이프라인의 운영 산출물과 동일한 것으로 보지 않습니다.
 
 실행 로그 한 줄에는 `run_id`, `started_at`, `finished_at`, `region`, `collected_count`, `normalized_count`, `loaded_count`, `quality_status`, `errors`를 기록합니다. DB 적재를 사용하지 않은 실행은 `loaded_count: 0`, `load_status: skipped`로 명확히 표시합니다.
 
-### 8.2 실행 방법
+### 8.3 실행 방법
 
 ### 설치
 
