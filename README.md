@@ -534,37 +534,7 @@
 | 통증·부상·호흡곤란·흉통 등 위험 신호 | 운동 추천을 중단하고 즉시 휴식 및 의료 전문가 상담 안내 |
 | DB 조회 또는 AI API 실패 | 실패 상태를 구분해 안내하고, 확인하지 못한 자료를 조회한 것처럼 표현하지 않음 |
 
-```mermaid
-sequenceDiagram
-    autonumber
-    actor U as 👤 사용자
-    participant B as 🖥️ 브라우저
-    participant D as ⚙️ Django 챗봇 API
-    participant M as 🗄️ Supabase m3_processed
-    participant R as 📊 시설 추천 엔진
-    participant O as 🤖 OpenAI
-
-    U->>B: 오늘 운동/시설 추천 질문
-    B->>D: 질문 + 프로필 (브라우저에 API 키 없음)
-    D->>D: 프로필·최근 운동 기록 읽기<br/>질문 의도와 안전 신호 확인
-    opt 시설 추천 의도가 포함된 경우
-        D->>R: 프로필 지역·선호 운동 기준 추천 요청
-        R-->>D: 시설 상위 3곳·점수·추천 이유
-    end
-    opt 운동처방 질문인 경우
-        alt 통증·부상 등 안전 신호 감지
-            D->>D: 처방 검색 생략<br/>안전 안내 context 생성
-        else 운동 가능한 질문
-            D->>M: 처방 키워드 검색<br/>지역 조건(위치기반 테이블), 테이블별 최대 50건
-            M-->>D: 조건 일치 처방 후보
-            D->>D: 중복 처방 제거·공통 운동 집계<br/>일치 건수·신뢰도 계산
-        end
-    end
-    D->>O: 시스템 규칙 + 프로필·운동 기록<br/>검색 집계 결과 + 질문
-    O-->>D: 데이터 근거를 반영한 답변
-    D-->>B: 우심이 답변 + 시설 추천 카드(해당 시)
-    B-->>U: 화면에 표시
-```
+![우심이 데이터 기반 챗봇 응답 과정](docs/images/chatbot-sequence.png)
 
 **우심이의 규칙**
 
