@@ -725,21 +725,28 @@ sequenceDiagram
     actor U as 👤 사용자
     participant B as 🖥️ 브라우저
     participant D as ⚙️ Django 챗봇 API
-    participant R as 📊 추천 엔진
+    participant M as 🗄️ Supabase m3_processed
+    participant R as 📊 시설 추천 엔진
     participant O as 🤖 OpenAI
 
-    U->>B: "오늘 비 오는데 어디서 운동할까?"
-    B->>D: 질문 + 프로필 (API 키 없음)
-    D->>D: 운동 코칭 의도·안전 신호·프로필 조건 확인
-    alt 시설·날씨 추천 질문
-        D->>R: 추천 결과 요청
-        R-->>D: 상위 3곳 · 점수 · 이유
-    else 운동처방 질문
-        D->>D: m3_processed 운동처방 2개 테이블 조건 검색·집계
+    U->>B: 오늘 운동/시설 추천 질문
+    B->>D: 질문 + 프로필 (브라우저에 API 키 없음)
+    D->>D: 프로필·최근 운동 기록 읽기<br/>질문 의도와 안전 신호 확인
+    par 시설 추천 질문인 경우
+        D->>R: 프로필 지역·선호 운동 기준 추천 요청
+        R-->>D: 시설 상위 3곳·점수·추천 이유
+    and 운동처방 질문인 경우
+        alt 통증·부상 등 안전 신호 감지
+            D->>D: 처방 검색 생략<br/>안전 안내 context 생성
+        else 운동 가능한 질문
+            D->>M: 운동처방 2개 테이블 조건 검색<br/>테이블별 최대 50건
+            M-->>D: 조건 일치 처방 후보
+            D->>D: 중복 처방 제거·공통 운동 집계<br/>일치 건수·신뢰도 계산
+        end
     end
-    D->>O: 우심이 규칙 + 내 기록 + 검색 집계 결과 + 질문
-    O-->>D: 답변
-    D-->>B: 우심이 답변 + 추천 카드
+    D->>O: 시스템 규칙 + 프로필·운동 기록<br/>검색 집계 결과 + 질문
+    O-->>D: 데이터 근거를 반영한 답변
+    D-->>B: 우심이 답변 + 시설 추천 카드(해당 시)
     B-->>U: 화면에 표시
 ```
 
