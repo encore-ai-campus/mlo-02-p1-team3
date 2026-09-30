@@ -396,71 +396,7 @@ flowchart TB
 
 ### 6-2. 관계도
 
-```mermaid
-erDiagram
-    MEMBER ||--o| WORKOUT_PROGRESS : "운동 기록 1개"
-    MEMBER ||--o{ FRIENDSHIP : "친구 여러 명"
-    MEMBER ||--o{ FRIEND_REQUEST : "친구 요청 보냄/받음"
-    MEMBER ||--o{ FRIEND_NOTE : "한마디 작성"
-
-    MEMBER {
-        int id PK
-        string name "이름"
-        string nickname UK "닉네임"
-        string password_hash "비밀번호 해시"
-        string address "기본 운동 지역"
-        string friend_code UK "USIM-XXXXXX"
-        json room_state "방 꾸미기 상태"
-        json room_layout "가구 배치"
-        string selected_dragon_design "펫 디자인"
-        datetime created_at
-    }
-    WORKOUT_PROGRESS {
-        int id PK
-        int member_id FK "회원과 1:1"
-        int total_calories "누적 칼로리"
-        json entries "최근 기록 30건"
-        datetime updated_at
-    }
-    FRIENDSHIP {
-        int id PK
-        int member_id FK
-        int friend_id FK
-        datetime created_at
-    }
-    FRIEND_REQUEST {
-        int id PK
-        int requester_id FK "보낸 사람"
-        int recipient_id FK "받는 사람"
-        string status "pending / accepted / declined"
-        datetime responded_at
-    }
-    FRIEND_NOTE {
-        int id PK
-        int author_id FK
-        text text "최대 60자"
-        datetime created_at
-    }
-    SITE_VISIT {
-        int id PK
-        string visitor_key "방문자 식별값"
-        date visited_on "하루 1회"
-    }
-    PROFILE {
-        int id PK
-        string nickname UK
-        string age_group
-        string city
-    }
-```
-
-```text
-Member 1 ─── 1 WorkoutProgress
-Member 1 ─── N Friendship
-Member 1 ─── N FriendRequest
-Member 1 ─── N FriendNote
-SiteVisit · Profile 은 독립 테이블 (방문 집계 · 추천 호환용)
-```
+![우심운까 서비스 데이터 관계도](docs/images/woosimwoonkka-erd.png)
 
 ### 6-3. 추천에 쓰이는 데이터 테이블
 
