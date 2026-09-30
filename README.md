@@ -466,18 +466,27 @@ SiteVisit · Profile 은 독립 테이블 (방문 집계 · 추천 호환용)
 
 서비스 DB는 Supabase PostgreSQL의 별도 스키마로 관리합니다. 수집 원본은 `m3_raw`, 정제 데이터는 `m3_processed`, 파생 결과는 `m3_derived`, 실행 이력은 `m3_monitoring`에 저장합니다. 추천·AI 코치는 정제 테이블을 조회하고, 원본 데이터는 재처리와 장애 분석을 위해 보존합니다.
 
-| 테이블 | 주요 컬럼·내용 | 서비스에서의 사용 |
-|---|---|---|
-| `m3_processed.facility` | 시설명·유형·시도·시군구·주소·위도·경도 | 추천 후보 조회, 지역·종목 필터, 거리 점수 계산 |
-| `m3_processed.weather_ultra_ncst` | 격자(nx, ny), T1H·REH·PTY·RN1·WSD, 관측 시각 | 실내·실외 추천 점수 보정 |
-| `m3_processed.air_quality` | 측정소, PM10·PM2.5·O3·통합대기지수 | 대기질에 따른 실내 시설 가점·실외 시설 감점 |
-| `m3_processed.aed` | 설치 장소·주소·좌표·상세 위치 | 추천 상세 보기의 AED 안전정보 |
-| `m3_processed.culture_sports_facility_safety_inspections` | 시설명·점검일·점검 결과 | 추천 상세 보기의 안전점검 정보 |
-| `m3_processed.public_open_facility` | 운영·개방 정보 | 운영정보 참고·품질 보완 |
-| `m3_processed.culture_fitness_measurement_prescriptions` | 연령대·성별·측정 장소·운동처방 | AI 코치가 체력 조건에 맞는 처방 검색 |
-| `m3_processed.culture_location_fitness_measurement_prescriptions` | 지역·연령대·체력 측정값·처방·측정센터 | AI 코치가 지역·체력 조건에 맞는 처방 검색 |
-| `m3_derived.facility_recommendation` | 시설 추천용 파생 데이터 | 분석·적재 결과 보관; 현재 추천 요청은 실시간 조건으로 재계산 |
-| `m3_monitoring.pipeline_run_history` | run_id·단계별 건수·상태·오류 | 파이프라인 실행·DQ 모니터링 |
+**운동 장소 추천**
+
+- `m3_processed.facility` — 시설명·유형·지역·주소·좌표로 후보를 조회하고, 지역·운동 종목을 필터링해 거리 점수를 계산합니다.
+- `m3_processed.weather_ultra_ncst` — 격자(nx, ny)와 기온(T1H)·습도(REH)·강수(PTY·RN1)·풍속(WSD)를 이용해 실내·실외 추천 점수를 보정합니다.
+- `m3_processed.air_quality` — 측정소의 PM10·PM2.5·오존·통합대기지수로 대기질 점수를 보정합니다.
+
+**추천 상세 안전정보**
+
+- `m3_processed.aed` — 설치 주소와 상세 위치를 추천 상세 화면에 표시합니다.
+- `m3_processed.culture_sports_facility_safety_inspections` — 시설의 안전점검 결과와 점검일을 표시합니다.
+- `m3_processed.public_open_facility` — 공공시설 운영·개방 정보를 보관해 운영정보 참고와 품질 보완에 사용합니다.
+
+**AI 운동 코치**
+
+- `m3_processed.culture_fitness_measurement_prescriptions` — 연령대·성별·측정 장소에 따른 운동처방을 검색합니다.
+- `m3_processed.culture_location_fitness_measurement_prescriptions` — 지역·연령대·체력 측정값·측정센터에 따른 운동처방을 검색합니다.
+
+**분석·운영 기록**
+
+- `m3_derived.facility_recommendation` — 시설 추천용 파생 결과를 보관합니다. 현재 추천 요청은 최신 조건으로 점수를 다시 계산합니다.
+- `m3_monitoring.pipeline_run_history` — `run_id`, 단계별 처리 건수, 상태와 오류를 기록해 파이프라인·DQ 실행을 모니터링합니다.
 
 현재 Supabase DB에는 39개 테이블(`m3_raw` 19개, `m3_processed` 18개, `m3_derived` 1개, `m3_monitoring` 1개)이 저장되어 있습니다. 실제 사용자 흐름에서 직접 조회하는 데이터는 시설·날씨·대기질, AED·안전점검, AI 운동처방 데이터입니다.
 
