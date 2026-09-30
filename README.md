@@ -452,30 +452,7 @@
 
 `휴관` · `휴무` · `운영시간` · `공사` · `점검` · `임시` · `이용 제한` · `폐관` · `예약`
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant S as ⚙️ 추천 서버
-    participant K as 🗺️ 카카오 로컬
-    participant R as 📜 robots.txt
-    participant W as 🌐 시설 홈페이지
-
-    S->>S: 점수 상위 10개 시설 선택
-    alt 홈페이지 주소가 없으면
-        S->>K: 시설명 + 주소로 장소 검색
-        K-->>S: 장소 페이지 주소
-    end
-    S->>R: 이 페이지를 읽어도 되나요?
-    alt 허용 안 됨
-        R-->>S: 차단 → blocked_by_robots (확인 필요)
-    else 허용
-        S->>W: 페이지 요청
-        W-->>S: HTML
-        S->>S: 휴관·휴무·운영시간 문구 추출
-        S->>S: "오늘 휴관" 등 발견 시 −25점
-    end
-    S->>S: 점수순 재정렬 → 추천 카드에 공지 표시
-```
+![우심운까 시설 운영정보 확인 과정](docs/images/crawling-sequence.png)
 
 | 결과 상태 | 의미 | 화면 표시 |
 |---|---|---|
