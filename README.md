@@ -367,7 +367,7 @@
 
 #### 추천은 이런 순서로 만들어집니다
 
-![우심운까 시스템 아키텍처](docs/images/architecture.png)
+![우심운까 운동 장소 추천 과정](docs/images/recommendation-flow.png)
 
 #### 점수 공식
 
