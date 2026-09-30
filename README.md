@@ -1,5 +1,7 @@
 <div align="center">
 
+<img src="docs/images/motive-team-logo.png" alt="MOTIVE 팀 로고" width="900" />
+
 # 🏠 우심운까 · WoosimWoonkka
 
 ### "우리 심심한데 운동이나 할까?"
@@ -10,8 +12,6 @@
 운동 기록으로 **나만의 운동방**을 채워 가는 웹 서비스
 
 [🔗 서비스 바로가기](https://hkjfduhalihufsduahufahoiuw.onrender.com/)
-
-![우심운까 메인 화면 — 나만의 운동방](docs/images/01-home.png)
 
 </div>
 
