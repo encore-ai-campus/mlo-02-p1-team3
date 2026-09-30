@@ -2,7 +2,7 @@
 
 <img src="docs/images/motive-team-logo.png" alt="MOTIVE 팀 로고" width="900" />
 
-# 🏠 우심운까
+# 🏠 우심운까 
 
 ### "우리 심심한데 운동이나 할까?"
 
