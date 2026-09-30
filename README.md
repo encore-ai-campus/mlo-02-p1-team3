@@ -421,21 +421,7 @@
 
 > **데이터 파이프라인** — 공장 컨베이어 벨트처럼, 데이터를 **받아 오고 → 씻고 → 검사하고 → 창고에 넣는** 과정을 자동으로 반복하는 흐름입니다.
 
-```mermaid
-flowchart TD
-    P["⏰ APScheduler<br/>데이터셋별 주기 실행"] --> A
-    A["🏛️ 공공데이터 API · 문화빅데이터"] -->|"수집"| B[("📦 Supabase m3_raw<br/>받은 그대로 보존")]
-    B --> C["🧹 Cleaning · Transformation<br/>필드명 통일 · 자료형 변환 · 좌표 정리"]
-    C --> D{"✅ Data Quality<br/>필수값 · 중복 · 좌표 범위"}
-    D -->|"정상·확인 필요"| E[("🗄️ Supabase m3_processed<br/>정제 데이터 + DQ 표시")]
-    D -->|"제외 기준 해당"| F["🚫 적재 제외 · 사유 기록"]
-    E --> G["⚙️ Django 추천·챗봇"]
-    E --> H[("📊 m3_derived<br/>파생 결과")]
-    B -.-> L[("📝 m3_monitoring.pipeline_run_history<br/>실행 상태 · 건수 · DQ 요약")]
-    D -.-> L
-    F -.-> L
-    L -.-> N["🔔 실패·이상 Discord 알림"]
-```
+![우심운까 데이터 파이프라인](docs/images/data-pipeline.png)
 
 | 단계 | 하는 일 | 예시 |
 |---|---|---|
