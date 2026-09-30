@@ -336,7 +336,7 @@ flowchart TB
 | 10 | AI 챗봇 구현 | 우심이 챗봇 | 김형준·프론트엔드 |
 | 11 | 테스트·배포 | 테스트 결과·배포 서비스 | 전원 |
 
-![우심운까 프로젝트 WBS 작업 흐름도](docs/images/wbs-flow.svg)
+![우심운까 프로젝트 WBS 작업 흐름도](docs/images/wbs-flow.png)
 
 <sub>🟩 데이터 · 🟦 백엔드 · 🟧 프론트엔드 · ⬜ 전원</sub>
 
