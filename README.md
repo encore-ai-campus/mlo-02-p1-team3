@@ -63,7 +63,7 @@
 |---|---|---|
 | **신경호** | 프론트엔드 · 발표자료 | 서비스 화면 구현, 사용자 인터페이스 구성, 발표자료 준비 |
 | **류지예** | 프론트엔드 · 발표자료 | 서비스 화면 구현, 사용자 경험 구성, 발표자료 준비 |
-| **백선영** | 서비스 기획 · 데이터 엔지니어링 | 서비스 기획, 공공데이터 조사·선정, 데이터 수집·정제·품질검증, PostgreSQL 데이터 파이프라인 구축, 스케줄링·모니터링·알림 자동화 |
+| **백선영** | 서비스 기획 · 데이터 엔지니어링 | 서비스 기획, 공공데이터 조사·선정, 데이터 수집·정제·품질검증, Supabase(PostgreSQL) 데이터 파이프라인 구축, 스케줄링·모니터링·알림 자동화 |
 | **김형준** | 백엔드 · 프로젝트 전반 | Django 백엔드, 기능 연동, 배포 설정 및 프로젝트 전반 |
 
 ![우심운까 팀 역할과 협업 구조](docs/images/team-roles.png)
@@ -185,7 +185,7 @@
 | 환경 반영 점수 | 거리·날씨·대기질을 반영한 추천 점수와 추천 이유 제공 |
 | 헛걸음 방지 | 추천 시점에 운영·휴무 정보 확인 |
 | 믿을 수 있는 데이터 | 공공데이터와 문화빅데이터 수집·정제·품질검증 |
-| 데이터 관리 | PostgreSQL 원본(RAW)·정제(PROCESSED) 데이터 분리 |
+| 데이터 관리 | Supabase 데이터베이스에서 원본(RAW)·정제(PROCESSED) 데이터 분리 |
 | 지속의 재미 | 운동 칼로리 기록과 레벨업, 운동방 꾸미기와 친구 방문 |
 | 대화형 도움 | AI 운동 코치 '우심이' 제공 |
 
@@ -203,18 +203,20 @@
 | :---: | :--- |
 | **Frontend** | <img src="docs/images/badges/html5.svg" alt="HTML5" height="24" /> <img src="docs/images/badges/css3.svg" alt="CSS3" height="24" /> <img src="docs/images/badges/javascript.svg" alt="JavaScript" height="24" /> |
 | **Backend** | <img src="docs/images/badges/python.svg" alt="Python" height="24" /> <img src="docs/images/badges/django.svg" alt="Django" height="24" /> |
-| **Database** | <img src="docs/images/badges/postgresql.svg" alt="PostgreSQL" height="24" /> <img src="docs/images/badges/postgis.svg" alt="PostGIS" height="24" /> |
+| **Database** | **Supabase** · <img src="docs/images/badges/postgresql.svg" alt="PostgreSQL" height="24" /> <img src="docs/images/badges/postgis.svg" alt="PostGIS" height="24" /> |
 | **Collaboration** | <img src="docs/images/badges/github.svg" alt="GitHub" height="24" /> <img src="docs/images/badges/notion.svg" alt="Notion" height="24" /> |
 
 </div>
+
+> 데이터베이스 서비스는 **Supabase**를 사용합니다. Supabase의 관리형 **PostgreSQL**이 데이터를 저장하고, **PostGIS**는 위치·거리 계산에 사용하는 PostgreSQL 확장입니다. 문서의 PostgreSQL 표기는 DB 서비스 제공자가 아니라 기반 엔진을 뜻합니다.
 
 | 구분 | 기술 | 사용 목적 | 🙋 쉽게 말하면 |
 |---|---|---|---|
 | Frontend | HTML, CSS, JavaScript, Django Template | 운동방·추천·프로필·친구 화면 | 사용자가 **눈으로 보고 누르는 화면** |
 | Backend | Python, Django | 회원·추천·운동 기록·친구 API | 화면 뒤에서 **요청을 받아 계산하고 저장하는 두뇌** |
-| Database | PostgreSQL, PostGIS | 회원·시설·위치·운동 데이터 | 모든 정보를 담는 **창고**, PostGIS는 "여기서 몇 km?"를 계산하는 **지도 계산기** |
+| Database | **Supabase** (관리형 PostgreSQL, PostGIS 확장) | 회원·시설·위치·운동 데이터 | Supabase는 관리형 **창고 서비스**, PostgreSQL은 저장 엔진, PostGIS는 "여기서 몇 km?"를 계산하는 **지도 기능** |
 | Data Collection | requests, BeautifulSoup4 | API 및 운영정보 수집 | 공공데이터를 **받아 오고**, 홈페이지 글자를 **읽어 오는** 도구 |
-| Coordinate | pyproj, PostGIS | 좌표 변환 및 거리 계산 | 서로 다른 좌표 형식을 **하나로 맞추는** 도구 |
+| Coordinate | pyproj, Supabase PostgreSQL의 PostGIS | 좌표 변환 및 거리 계산 | 서로 다른 좌표 형식을 **하나로 맞추고**, DB에서 위치 간 거리를 계산하는 도구 |
 | AI | OpenAI API | AI 운동 코치 | '우심이'의 **대화 능력** |
 | External API | 기상청·에어코리아·카카오 | 날씨·대기질·주소·장소 검색 | 다른 기관이 제공하는 **정보 창구** |
 | Deployment | Gunicorn, WhiteNoise, Render | 서비스 배포 | 누구나 인터넷으로 접속할 수 있게 **서버에 올리는** 도구 |
@@ -226,6 +228,8 @@
 ### 시스템 구조 — 한 번의 추천 요청은 이렇게 흘러갑니다
 
 ![우심운까 시스템 아키텍처](docs/images/architecture.png)
+
+> 아키텍처 그림의 `PostgreSQL + PostGIS`는 **Supabase가 제공하는 데이터베이스 엔진과 확장 기능**을 가리킵니다. 별도의 PostgreSQL 호스팅 서비스를 사용한다는 뜻은 아닙니다.
 
 ![우심운까를 만드는 기술](docs/images/tech-stack.png)
 
@@ -244,7 +248,7 @@
 | 3 | 데이터 수집 | API 원본 JSON·CSV | 백선영 |
 | 4 | 데이터 전처리·표준화 | 정제 데이터 | 백선영 |
 | 5 | 품질검증 | DQ 결과·오류 로그 | 백선영 |
-| 6 | PostgreSQL 구축 | DB 테이블·적재 결과 | 백선영·김형준 |
+| 6 | Supabase 데이터베이스 구축 | 테이블·데이터 적재 결과 (PostgreSQL 기반) | 백선영·김형준 |
 | 7 | 추천 백엔드 구현 | 추천 API·점수 계산 | 김형준 |
 | 8 | 프론트엔드 구현 | 운동방·추천·친구 화면 | 신경호·류지예 |
 | 9 | 운동 기록·레벨 구현 | 칼로리·레벨·보상 기능 | 김형준 |
@@ -321,7 +325,7 @@
 
 ### 6-3. 추천에 쓰이는 데이터 테이블
 
-서비스 DB는 Supabase PostgreSQL의 별도 스키마로 관리합니다. 수집 원본은 `m3_raw`, 정제 데이터는 `m3_processed`, 파생 결과는 `m3_derived`, 실행 이력은 `m3_monitoring`에 저장합니다. 추천·AI 코치는 정제 테이블을 조회하고, 원본 데이터는 재처리와 장애 분석을 위해 보존합니다.
+운영 데이터베이스 서비스는 **Supabase**이며, 저장 엔진은 PostgreSQL입니다. Supabase PostgreSQL의 별도 스키마에서 수집 원본은 `m3_raw`, 정제 데이터는 `m3_processed`, 파생 결과는 `m3_derived`, 실행 이력은 `m3_monitoring`에 저장합니다. 추천·AI 코치는 정제 테이블을 조회하고, 원본 데이터는 재처리와 장애 분석을 위해 보존합니다.
 
 **운동 장소 추천**
 
@@ -820,12 +824,12 @@ git clone https://github.com/2nd-MLOps-engineer/hkjfduhalihufsduahufahoiuw.git
 cd hkjfduhalihufsduahufahoiuw
 python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
-cp .env.example .env   # API 키와 DATABASE_URL 입력
+cp .env.example .env   # API 키와 Supabase PostgreSQL 연결용 DATABASE_URL 입력
 python manage.py migrate
 python manage.py runserver
 ```
 
-- 추천 기능에는 PostGIS와 시설·날씨·대기질 정제 테이블 데이터가 필요합니다. `migrate`는 회원·운동량 등 Django 테이블만 만듭니다.
+- 추천 기능은 Supabase PostgreSQL의 PostGIS 확장과 시설·날씨·대기질 정제 테이블 데이터를 사용합니다. `migrate`는 회원·운동량 등 Django 테이블을 연결된 데이터베이스에 만듭니다.
 - 필요한 환경변수: `DATABASE_URL`, `KAKAO_REST_API_KEY`, `KAKAO_JAVASCRIPT_KEY`, `KMA_SERVICE_KEY`, `AIRKOREA_SERVICE_KEY`, `FACILITY_API_URL`, `FACILITY_SERVICE_KEY`, `OPENAI_API_KEY`(챗봇)
 - 수집 테스트: `python frontend/collector.py --region "서울특별시 관악구" --limit 50`
 - 시설 누락값 보완 리포트: `python manage.py enrich_facilities --limit 100` (`--apply`를 줄 때만 DB 반영)
@@ -854,8 +858,9 @@ python manage.py runserver
 | **프론트엔드** | 사용자가 보는 화면 부분 |
 | **백엔드** | 화면 뒤에서 계산·저장을 담당하는 서버 부분 |
 | **Django** | 파이썬으로 웹 서비스의 백엔드를 만드는 도구 |
-| **데이터베이스 (PostgreSQL)** | 정보를 표 형태로 저장하는 창고 |
-| **PostGIS** | 데이터베이스에서 "두 지점 사이 거리"같은 지도 계산을 할 수 있게 해 주는 확장 기능 |
+| **Supabase** | PostgreSQL 데이터베이스·API 등을 관리형으로 제공하는 서비스. 이 프로젝트의 운영 데이터베이스 |
+| **PostgreSQL** | Supabase가 데이터를 표 형태로 저장하는 관계형 데이터베이스 엔진 |
+| **PostGIS** | Supabase PostgreSQL에 설치해 좌표·거리 등 공간 데이터를 처리하는 확장 기능 |
 | **좌표 (위도·경도)** | 지구 위의 위치를 숫자로 나타낸 것 (예: 37.59, 127.09) |
 | **RAW / PROCESSED** | RAW = 받은 그대로의 원본, PROCESSED = 깨끗하게 정리한 데이터 |
 | **전처리 (Cleaning)** | 제각각인 이름·형식을 통일하고 잘못된 값을 정리하는 작업 |
