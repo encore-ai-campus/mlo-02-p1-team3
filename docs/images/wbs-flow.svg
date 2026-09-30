@@ -1,0 +1,124 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="930" viewBox="0 0 1600 930" role="img" aria-labelledby="title desc">
+  <title id="title">우심운까 프로젝트 WBS 흐름</title>
+  <desc id="desc">기획부터 데이터 파이프라인, 백엔드와 프론트엔드 구현, AI 챗봇, 테스트와 배포까지의 작업 흐름과 담당자</desc>
+  <defs>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M1,1 L11,6 L1,11 Z" fill="#7b8794"/>
+    </marker>
+    <style>
+      text { font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; }
+      .title { font-size: 34px; font-weight: 700; fill: #263c34; }
+      .subtitle { font-size: 18px; fill: #66756e; }
+      .node-title { font-size: 21px; font-weight: 700; fill: #25352f; }
+      .node-sub { font-size: 16px; fill: #46564f; }
+      .owner { font-size: 15px; fill: #52625b; }
+      .num { font-size: 16px; font-weight: 700; fill: #fff; }
+      .legend { font-size: 16px; font-weight: 600; fill: #35443e; }
+      .edge { fill: none; stroke: #7b8794; stroke-width: 3; marker-end: url(#arrow); }
+      .data { fill: #e8f4ea; stroke: #47865a; }
+      .backend { fill: #e8eefb; stroke: #526eae; }
+      .frontend { fill: #fff0e7; stroke: #c9794e; }
+      .all { fill: #f0f1f2; stroke: #80878c; }
+    </style>
+  </defs>
+
+  <rect width="1600" height="930" rx="28" fill="#fbf8f1"/>
+  <text x="64" y="72" class="title">우심운까 프로젝트 WBS</text>
+  <text x="64" y="108" class="subtitle">기획과 데이터 구축에서 시작해 기능 구현, 통합 테스트와 배포로 이어집니다.</text>
+
+  <!-- connectors -->
+  <path class="edge" d="M440 200 H500"/>
+  <path class="edge" d="M670 248 V286"/>
+  <path class="edge" d="M670 376 V414"/>
+  <path class="edge" d="M670 504 V542"/>
+  <path class="edge" d="M670 632 V670"/>
+  <path class="edge" d="M840 718 C900 718 900 232 950 232"/>
+  <path class="edge" d="M840 718 C900 718 900 410 950 410"/>
+  <path class="edge" d="M840 718 C900 718 900 588 950 588"/>
+  <path class="edge" d="M1120 232 C1190 232 1180 388 1250 388"/>
+  <path class="edge" d="M1120 410 H1250"/>
+  <path class="edge" d="M1120 588 C1190 588 1180 432 1250 432"/>
+  <path class="edge" d="M1120 766 C1200 766 1180 454 1250 454"/>
+  <path class="edge" d="M840 200 C1050 132 1110 190 1250 368"/>
+
+  <!-- planning -->
+  <g transform="translate(80 155)">
+    <rect width="360" height="90" rx="16" class="all" stroke-width="2.5"/>
+    <circle cx="32" cy="30" r="20" fill="#727a80"/><text x="32" y="36" text-anchor="middle" class="num">1</text>
+    <text x="64" y="36" class="node-title">서비스 기획 · 요구사항 정의</text>
+    <text x="64" y="66" class="owner">산출물: 요구사항 명세서 · 담당: 전원</text>
+  </g>
+  <!-- data pipeline -->
+  <g transform="translate(500 155)">
+    <rect width="340" height="90" rx="16" class="data" stroke-width="2.5"/>
+    <circle cx="32" cy="30" r="20" fill="#47865a"/><text x="32" y="36" text-anchor="middle" class="num">2</text>
+    <text x="64" y="36" class="node-title">공공데이터 조사·선정</text>
+    <text x="64" y="66" class="owner">데이터 목록·활용 목적 · 백선영</text>
+  </g>
+  <g transform="translate(500 286)">
+    <rect width="340" height="90" rx="16" class="data" stroke-width="2.5"/>
+    <circle cx="32" cy="30" r="20" fill="#47865a"/><text x="32" y="36" text-anchor="middle" class="num">3</text>
+    <text x="64" y="36" class="node-title">데이터 수집</text>
+    <text x="64" y="66" class="owner">API 원본 JSON·CSV · 백선영</text>
+  </g>
+  <g transform="translate(500 414)">
+    <rect width="340" height="90" rx="16" class="data" stroke-width="2.5"/>
+    <circle cx="32" cy="30" r="20" fill="#47865a"/><text x="32" y="36" text-anchor="middle" class="num">4</text>
+    <text x="64" y="36" class="node-title">전처리 · 표준화</text>
+    <text x="64" y="66" class="owner">정제 데이터 · 백선영</text>
+  </g>
+  <g transform="translate(500 542)">
+    <rect width="340" height="90" rx="16" class="data" stroke-width="2.5"/>
+    <circle cx="32" cy="30" r="20" fill="#47865a"/><text x="32" y="36" text-anchor="middle" class="num">5</text>
+    <text x="64" y="36" class="node-title">품질검증</text>
+    <text x="64" y="66" class="owner">DQ 결과·오류 로그 · 백선영</text>
+  </g>
+  <g transform="translate(500 670)">
+    <rect width="340" height="96" rx="16" class="data" stroke-width="2.5"/>
+    <circle cx="32" cy="30" r="20" fill="#47865a"/><text x="32" y="36" text-anchor="middle" class="num">6</text>
+    <text x="64" y="36" class="node-title">PostgreSQL 구축</text>
+    <text x="64" y="67" class="owner">DB 테이블·적재 결과 · 백선영·김형준</text>
+  </g>
+
+  <!-- feature implementation branches -->
+  <g transform="translate(950 185)">
+    <rect width="340" height="94" rx="16" class="backend" stroke-width="2.5"/>
+    <circle cx="32" cy="30" r="20" fill="#526eae"/><text x="32" y="36" text-anchor="middle" class="num">7</text>
+    <text x="64" y="36" class="node-title">추천 백엔드 구현</text>
+    <text x="64" y="68" class="owner">추천 API·점수 계산 · 김형준</text>
+  </g>
+  <g transform="translate(950 363)">
+    <rect width="340" height="94" rx="16" class="frontend" stroke-width="2.5"/>
+    <circle cx="32" cy="30" r="20" fill="#c9794e"/><text x="32" y="36" text-anchor="middle" class="num">8</text>
+    <text x="64" y="36" class="node-title">프론트엔드 구현</text>
+    <text x="64" y="68" class="owner">운동방·추천·친구 화면 · 신경호·류지예</text>
+  </g>
+  <g transform="translate(950 541)">
+    <rect width="340" height="94" rx="16" class="backend" stroke-width="2.5"/>
+    <circle cx="32" cy="30" r="20" fill="#526eae"/><text x="32" y="36" text-anchor="middle" class="num">9</text>
+    <text x="64" y="36" class="node-title">운동 기록 · 레벨 구현</text>
+    <text x="64" y="68" class="owner">칼로리·레벨·보상 기능 · 김형준</text>
+  </g>
+  <g transform="translate(950 719)">
+    <rect width="340" height="94" rx="16" class="backend" stroke-width="2.5"/>
+    <circle cx="32" cy="30" r="20" fill="#526eae"/><text x="32" y="36" text-anchor="middle" class="num">10</text>
+    <text x="82" y="36" class="node-title">AI 챗봇 구현</text>
+    <text x="82" y="68" class="owner">우심이 챗봇 · 김형준·프론트엔드</text>
+  </g>
+
+  <!-- QA and release -->
+  <g transform="translate(1250 352)">
+    <rect width="290" height="112" rx="18" class="all" stroke-width="3"/>
+    <circle cx="36" cy="34" r="22" fill="#727a80"/><text x="36" y="40" text-anchor="middle" class="num">11</text>
+    <text x="74" y="42" class="node-title">테스트 · 배포</text>
+    <text x="28" y="78" class="node-sub">테스트 결과·배포 서비스</text>
+    <text x="28" y="101" class="owner">담당: 전원</text>
+  </g>
+
+  <g transform="translate(500 860)">
+    <rect x="0" y="-14" width="22" height="22" rx="5" fill="#e8f4ea" stroke="#47865a" stroke-width="2"/><text x="34" y="4" class="legend">데이터</text>
+    <rect x="150" y="-14" width="22" height="22" rx="5" fill="#e8eefb" stroke="#526eae" stroke-width="2"/><text x="184" y="4" class="legend">백엔드</text>
+    <rect x="310" y="-14" width="22" height="22" rx="5" fill="#fff0e7" stroke="#c9794e" stroke-width="2"/><text x="344" y="4" class="legend">프론트엔드</text>
+    <rect x="510" y="-14" width="22" height="22" rx="5" fill="#f0f1f2" stroke="#80878c" stroke-width="2"/><text x="544" y="4" class="legend">전원</text>
+  </g>
+</svg>

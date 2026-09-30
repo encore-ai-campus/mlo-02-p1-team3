@@ -330,27 +330,7 @@ flowchart TB
 | 10 | AI 챗봇 구현 | 우심이 챗봇 | 김형준·프론트엔드 |
 | 11 | 테스트·배포 | 테스트 결과·배포 서비스 | 전원 |
 
-```mermaid
-flowchart LR
-    S1["1 기획"] --> S2["2 데이터 조사"] --> S3["3 수집"] --> S4["4 전처리"] --> S5["5 품질검증"] --> S6["6 DB 구축"]
-    S6 --> S7["7 추천 백엔드"]
-    S6 --> S9["9 기록·레벨"]
-    S1 --> S8["8 프론트엔드"]
-    S7 --> S10["10 AI 챗봇"]
-    S7 --> S11["11 테스트·배포"]
-    S8 --> S11
-    S9 --> S11
-    S10 --> S11
-
-    classDef data fill:#e8f4ea,stroke:#3a7d44
-    classDef be fill:#e7eefb,stroke:#3b5ba5
-    classDef fe fill:#fdeee6,stroke:#c0643a
-    classDef all fill:#f3f3f3,stroke:#777
-    class S2,S3,S4,S5,S6 data
-    class S7,S9,S10 be
-    class S8 fe
-    class S1,S11 all
-```
+![우심운까 프로젝트 WBS 작업 흐름도](docs/images/wbs-flow.svg)
 
 <sub>🟩 데이터 · 🟦 백엔드 · 🟧 프론트엔드 · ⬜ 전원</sub>
 
