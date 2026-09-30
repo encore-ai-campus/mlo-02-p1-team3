@@ -589,21 +589,7 @@
 
 ### 7-7. 친구 방문
 
-```mermaid
-sequenceDiagram
-    actor A as 👤 나
-    participant S as ⚙️ 서버
-    actor B as 👤 친구
-
-    A->>S: 친구 코드 USIM-XXXXXX 조회
-    S-->>A: 친구 닉네임 · 레벨 확인
-    A->>S: 친구 요청 보내기
-    S-->>B: 요청 도착 (대기중)
-    B->>S: 수락 / 거절
-    S-->>A: 친구 목록에 추가 (양방향)
-    A->>S: 친구 운동방 방문
-    A->>S: 운동 한마디 남기기 (최대 60자)
-```
+![우심운까 친구 연결과 소통 흐름](docs/images/friend-sequence.png)
 
 ### 7-8. 주요 API
 
