@@ -29,6 +29,7 @@
   };
   const gender = () => getProfile().avatar_gender === "female" ? "female" : "male";
   const poseSource = pose => {
+    if (mascot.dataset.dragonSrc) return mascot.dataset.dragonSrc;
     const g = gender();
     const key = `${g}${pose.charAt(0).toUpperCase()}${pose.slice(1)}Src`;
     const generic = `${g.charAt(0).toUpperCase()}${g.slice(1)}Src`;
@@ -44,6 +45,17 @@
     const text = String(value || "").replace(/\s+/g, " ").trim();
     if (!text) return "";
     return text.length > max ? `${text.slice(0, max - 1)}…` : text;
+  };
+  const formatAssistantText = value => {
+    const escaped = String(value ?? "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/\"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+    return escaped
+      .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+      .replace(/\n/g, "<br>");
   };
   const hidePrompt = () => {
     if (promptTimer) clearTimeout(promptTimer);
@@ -229,7 +241,8 @@
     row.className = `usim-chat-row ${role}`;
     const bubble = document.createElement("div");
     bubble.className = "usim-chat-bubble";
-    bubble.textContent = String(text ?? "");
+    if (role === "assistant") bubble.innerHTML = formatAssistantText(text);
+    else bubble.textContent = String(text ?? "");
     const list = recommendationList(recommendations);
     if (list) bubble.appendChild(list);
     row.appendChild(bubble);

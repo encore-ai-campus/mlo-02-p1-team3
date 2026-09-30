@@ -108,7 +108,7 @@
 .workout-log-form button{height:44px;padding:0 14px;border:1.5px solid #274638;border-radius:11px;background:#315642;color:#fff8eb;font-size:9px;font-weight:950;white-space:nowrap;box-shadow:inset 0 -3px rgba(0,0,0,.08)}
 .workout-log-form button:hover{transform:translateY(-1px);background:#274a39}
 .room-progress-card{padding:12px;border:1px solid #c6baa7;border-radius:12px;background:#fffaf1}
-.room-progress-head{display:flex;align-items:center;justify-content:space-between;gap:10px}.room-progress-head span{color:#8b604e;font-size:7px;font-weight:950;letter-spacing:.12em}.room-progress-head strong{color:#315642;font-size:12px}
+.room-progress-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding-right:0}.room-progress-head span{color:#8b604e;font-size:7px;font-weight:950;letter-spacing:.12em}.room-progress-head strong{color:#315642;font-size:12px;white-space:nowrap}
 .room-progress-track{height:7px;margin:9px 0 8px;border-radius:99px;background:#e2d9ca;overflow:hidden}.room-progress-track i{display:block;width:0;height:100%;border-radius:inherit;background:linear-gradient(90deg,#315642,#d3a957);transition:width .35s ease}
 .room-progress-card p{margin:0;color:#756c61;font-size:8px;line-height:1.5}
 
@@ -141,7 +141,23 @@
 .room-progress-card{
   position:relative;
   overflow:hidden;
+  padding-top:40px;
 }
+.room-progress-actions{position:absolute;top:12px;right:12px;display:flex;align-items:center;gap:5px}
+.room-reset-progress-button,.workout-undo-button{
+  position:static;
+  border:1px solid #d7c7b1;
+  border-radius:7px;
+  background:#fffaf1;
+  color:#967565;
+  padding:5px 8px;
+  font-size:8px;
+  font-weight:900;
+  cursor:pointer;
+}
+.workout-undo-button{color:#5e7666;background:#f5f8f0}
+.room-reset-progress-button:hover{background:#f4e8d8;color:#6f5144}
+.workout-undo-button:hover{background:#e8f0e1;color:#315642}
 .room-level-row{
   display:flex;
   align-items:center;
@@ -239,6 +255,35 @@
 .character-skin-grid button.is-locked::after,.special-item-grid button.is-locked::after{content:"🔒";position:absolute;top:6px;right:7px;font-size:11px}
 .room-button-thumb{display:block!important;position:relative;width:100%;height:42px!important;margin:0 0 6px!important;border-radius:7px;background:#efe4d0;overflow:hidden}
 .room-button-thumb::before,.room-button-thumb::after{content:"";position:absolute;display:block}
+
+/* Final room asset set: the generated room is the fixed background and each
+   transparent PNG remains an independent, draggable room item. */
+.room-scene-2d{background:#211c22 url("../images/room/final/00_empty_room.png") center center/cover no-repeat}
+.room-scene-2d .room-wall-flat,.room-scene-2d .room-floor-flat,.room-scene-2d .room-baseboard{display:none}
+.legacy-room-items{display:none!important}
+.final-room-item{display:grid;place-items:center;z-index:8}
+.final-room-item img{display:block;width:100%;height:100%;object-fit:contain;object-position:center;pointer-events:none;user-select:none;filter:drop-shadow(3px 6px 4px rgba(22,15,17,.24))}
+.final-room-lamp{width:10%;height:31%;z-index:9}
+.final-room-amp{width:12%;height:17%;z-index:10}
+.final-room-bookshelf,.final-room-cabinet{width:18%;height:19%;z-index:9}
+.final-room-scroll{width:10%;height:26%;z-index:4}
+.final-room-side-table,.final-room-record{width:14%;height:26%;z-index:10}
+.final-room-sofa{width:22%;height:21%;z-index:9}
+.final-room-rug{width:38%;height:18%;z-index:3;filter:drop-shadow(2px 5px 3px rgba(22,15,17,.22))}
+.final-room-customizer-help{margin:0 0 9px;color:#756b5f;font-size:10px;line-height:1.5}
+.final-room-item-grid button{min-height:48px}
+.final-room-item-grid button span{color:#a15d45}
+.legacy-customizer-fieldset[hidden],.legacy-customizer-options[hidden]{display:none!important}
+
+@media(max-width:700px){
+  .final-room-lamp{width:14%;height:30%}
+  .final-room-amp{width:16%;height:17%}
+  .final-room-bookshelf,.final-room-cabinet{width:23%;height:18%}
+  .final-room-scroll{width:14%;height:24%}
+  .final-room-side-table,.final-room-record{width:18%;height:25%}
+  .final-room-sofa{width:28%;height:20%}
+  .final-room-rug{width:48%;height:17%}
+}
 .thumb-bed::before{left:12%;right:12%;bottom:10px;height:13px;border-radius:7px 7px 3px 3px;background:#6e8a79;box-shadow:0 -7px 0 #8b6c52}
 .thumb-bed::after{left:9%;bottom:9px;width:16px;height:24px;border-radius:5px 3px 3px 5px;background:#765b47}
 .thumb-desk::before{left:13%;right:13%;top:14px;height:7px;background:#94613e;box-shadow:0 12px 0 -1px #76533d}

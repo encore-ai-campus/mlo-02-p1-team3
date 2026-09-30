@@ -7,11 +7,11 @@
   <title>{% block title %}우심운까{% endblock %}</title>
   <meta name="csrf-token" content="{{ csrf_token }}">
   <link rel="stylesheet" href="{% static 'assets/css/base.css' %}?v=20260918-180">
-  <link rel="stylesheet" href="{% static 'assets/css/mini_home.css' %}?v=20260928-1125">
+  <link rel="stylesheet" href="{% static 'assets/css/mini_home.css' %}?v=20260929-1740">
   <link rel="stylesheet" href="{% static 'assets/css/pages.css' %}?v=20260918-180">
   {% block extra_css %}{% endblock %}
   <link rel="stylesheet" href="{% static 'assets/css/character_theme.css' %}?v=20260923-1600">
-  <link rel="stylesheet" href="{% static 'assets/css/chatbot.css' %}?v=20260928-1125">
+  <link rel="stylesheet" href="{% static 'assets/css/chatbot.css' %}?v=20260930-0845">
 </head>
 <body data-page="{{ active_tab|default:'home' }}" data-member-id="{{ member.id|default:'' }}" data-member-nickname="{{ member.nickname|default:''|escape }}" data-member-address="{{ member.address|default:''|escape }}" data-member-friend-code="{{ member.friend_code|default:''|escape }}" data-room-owner-id="{{ room_owner.id|default:member.id|default:'' }}" data-room-owner-nickname="{{ room_owner.nickname|default:member.nickname|default:''|escape }}" data-room-owner-address="{{ room_owner.address|default:member.address|default:''|escape }}" data-room-owner-calories="{{ visitor_total_calories|default:0 }}" data-room-visitor="{% if room_is_visitor %}1{% else %}0{% endif %}" data-location-loaded="{% if location_loaded %}1{% else %}0{% endif %}" data-is-guest="{% if is_guest %}1{% else %}0{% endif %}" data-home-url="{% url 'home' %}">
   <main class="site-stage">
@@ -145,7 +145,7 @@
 
     <section class="usim-chat-panel" id="usimChatPanel" aria-label="우심운까 AI 코치" hidden>
       <header class="usim-chat-panel-head">
-        <div class="usim-rpg-nameplate"><span class="usim-rpg-name-dot" aria-hidden="true"></span><div><strong>우심이</strong><small>AI MOVE NPC</small></div></div>
+        <div class="usim-rpg-nameplate"><img id="usimChatPanelMascot" class="usim-chat-panel-mascot" src="{% static 'assets/images/dragon/egg.png' %}" alt="우심이 캐릭터"><div><strong>우심이</strong><small id="usimChatStage">성장 중</small></div></div>
         <div class="usim-chat-head-actions">
           <button type="button" class="usim-chat-icon-btn" id="usimChatClear" title="대화 새로 시작" aria-label="대화 새로 시작">↻</button>
           <button type="button" class="usim-chat-icon-btn" id="usimChatClose" title="닫기" aria-label="AI 코치 닫기">×</button>
@@ -187,13 +187,14 @@
           data-female-tie-src="{% static 'assets/images/character/female_tie.png' %}"
           alt="">
       </div>
-      <div class="usim-chat-launcher-meta"><strong>우심이</strong><span>말 걸기</span></div>
+      <div class="usim-chat-launcher-meta"><strong>우심이</strong><span id="usimChatLevel">말 걸기</span></div>
     </button>
   </div>
 
   <script src="{% static 'assets/js/api.js' %}?v=20260918-180"></script>
   <script src="{% static 'assets/js/app.js' %}?v=20260923-1600"></script>
-  <script src="{% static 'assets/js/chatbot.js' %}?v=20260923-807"></script>
+  <script src="{% static 'assets/js/chatbot.js' %}?v=20260930-0845"></script>
+  <script src="{% static 'assets/js/dragon_character.js' %}?v=20260929-1500"></script>
   {% block extra_js %}{% endblock %}
 </body>
 </html>

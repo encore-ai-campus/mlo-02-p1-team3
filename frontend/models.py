@@ -3,6 +3,8 @@ import string
 
 from django.db import models
 
+from .progression import level_for_calories
+
 
 def generate_friend_code():
     alphabet = string.ascii_uppercase + string.digits
@@ -35,6 +37,7 @@ class Member(models.Model):
     friend_code = models.CharField(max_length=20, unique=True, null=True, blank=True)
     room_state = models.JSONField(default=dict, blank=True)
     room_layout = models.JSONField(default=dict, blank=True)
+    selected_dragon_design = models.CharField(max_length=20, blank=True, default="")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -58,7 +61,7 @@ class WorkoutProgress(models.Model):
 
     @property
     def level(self):
-        return (self.total_calories // 1500) + 1
+        return level_for_calories(self.total_calories)
 
     def __str__(self):
         return f"{self.member.nickname} · LV.{self.level}"
@@ -136,3 +139,23 @@ class SiteVisit(models.Model):
             ),
         ]
         ordering = ["-created_at"]
+
+
+class SelectedRecommendation(models.Model):
+    """회원이 추천 결과에서 운동 장소로 선택한 시설의 스냅샷."""
+
+    member = models.ForeignKey(Member, on_delete=models.CASCADE, related_name="selected_recommendations")
+    facility_name = models.CharField(max_length=200)
+    sport = models.CharField(max_length=40, blank=True)
+    address = models.CharField(max_length=300, blank=True)
+    latitude = models.FloatField(null=True, blank=True)
+    longitude = models.FloatField(null=True, blank=True)
+    score = models.PositiveSmallIntegerField(default=0)
+    recommendation_snapshot = models.JSONField(default=dict, blank=True)
+    selected_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["-selected_at"]
+
+    def __str__(self):
+        return f"{self.member.nickname} · {self.facility_name}"

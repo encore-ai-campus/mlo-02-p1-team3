@@ -11,8 +11,19 @@ from django.views.decorators.cache import never_cache
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 
 from .auth_forms import LoginForm, SignupForm
-from .models import FriendNote, FriendRequest, Friendship, Member, SiteVisit, WorkoutProgress, generate_friend_code
+from .models import (
+    FriendNote,
+    FriendRequest,
+    Friendship,
+    Member,
+    SelectedRecommendation,
+    SiteVisit,
+    WorkoutProgress,
+    generate_friend_code,
+)
 from .recommendation_service import make_recommendations
+from .dragon import DRAGON_DESIGNS, character_payload, dragon_level
+from .progression import clamp_calories, level_for_calories
 
 LOGIN_ERROR_MESSAGE = "아이디 또는 비밀번호 오류입니다."
 GUEST_SESSION_KEY = "guest_mode"
@@ -208,16 +219,75 @@ def check_member_nickname(request):
     return JsonResponse({"available": available})
 
 
+@never_cache
+@member_required
+@require_POST
+def select_recommendation_api(request):
+    """추천 시설을 오늘 운동 장소로 저장하고 지도 이동에 필요한 값을 반환한다."""
+    try:
+        payload = json.loads(request.body or "{}")
+    except json.JSONDecodeError:
+        return JsonResponse({"error": "추천 시설 정보 형식이 올바르지 않습니다."}, status=400)
+
+    name = str(payload.get("name") or "").strip()
+    if not name:
+        return JsonResponse({"error": "선택할 운동 시설이 없습니다."}, status=400)
+
+    def optional_float(value):
+        if value in (None, ""):
+            return None
+        try:
+            number = float(value)
+        except (TypeError, ValueError):
+            return None
+        return number if number == number else None
+
+    try:
+        score = max(0, min(99, int(payload.get("score", 0))))
+    except (TypeError, ValueError):
+        score = 0
+    snapshot = {
+        "facility_type": str(payload.get("facility_type") or ""),
+        "province": str(payload.get("province") or ""),
+        "district": str(payload.get("district") or ""),
+        "indoor": bool(payload.get("indoor")),
+        "distance_km": payload.get("distance_km"),
+        "travel_time": payload.get("travel_time"),
+        "score_breakdown": payload.get("score_breakdown") or {},
+        "reasons": payload.get("reasons") or [],
+        "operation_notice": str(payload.get("operation_notice") or ""),
+        "safety": payload.get("safety") or {},
+        "source": str(payload.get("source") or ""),
+    }
+    selected = SelectedRecommendation.objects.create(
+        member=request.usim_member,
+        facility_name=name[:200],
+        sport=str(payload.get("sport") or "")[:40],
+        address=str(payload.get("address") or "")[:300],
+        latitude=optional_float(payload.get("latitude")),
+        longitude=optional_float(payload.get("longitude")),
+        score=score,
+        recommendation_snapshot=snapshot,
+    )
+    return JsonResponse({
+        "selected": True,
+        "id": selected.id,
+        "facility_name": selected.facility_name,
+        "latitude": selected.latitude,
+        "longitude": selected.longitude,
+    })
+
+
 def _member_progress_payload(member):
     if not member.friend_code:
         member.friend_code = generate_friend_code()
         member.save(update_fields=["friend_code", "updated_at"])
     progress, _ = WorkoutProgress.objects.get_or_create(member=member)
-    total = max(0, int(progress.total_calories or 0))
+    total = clamp_calories(progress.total_calories)
     return {
         "friend_code": member.friend_code,
         "total_calories": total,
-        "level": (total // 1500) + 1,
+        "level": level_for_calories(total),
         "entries": progress.entries if isinstance(progress.entries, list) else [],
     }
 
@@ -251,10 +321,52 @@ def add_workout_calories(request):
     progress, _ = WorkoutProgress.objects.get_or_create(member=member)
     entries = progress.entries if isinstance(progress.entries, list) else []
     entries.insert(0, {"calories": amount, "created_at": timezone.now().isoformat()})
-    progress.total_calories = max(0, int(progress.total_calories or 0)) + amount
+    progress.total_calories = clamp_calories(progress.total_calories) + amount
     progress.entries = entries[:30]
     progress.save(update_fields=["total_calories", "entries", "updated_at"])
     return JsonResponse(_member_progress_payload(member))
+
+
+@never_cache
+@member_required
+@require_POST
+def reset_workout_progress(request):
+    """회원이 확인 후 운동량과 레벨을 LV.1 상태로 초기화한다."""
+    if getattr(request, "usim_guest", False):
+        return JsonResponse({"error": "게스트 모드에서는 초기화할 수 없습니다."}, status=403)
+    progress, _ = WorkoutProgress.objects.get_or_create(member=request.usim_member)
+    progress.total_calories = 0
+    progress.entries = []
+    progress.save(update_fields=["total_calories", "entries", "updated_at"])
+    room_state = request.usim_member.room_state if isinstance(request.usim_member.room_state, dict) else {}
+    room_state["characterSkin"] = "default"
+    request.usim_member.room_state = room_state
+    request.usim_member.save(update_fields=["room_state", "updated_at"])
+    return JsonResponse(_member_progress_payload(request.usim_member))
+
+
+@never_cache
+@member_required
+@require_POST
+def undo_last_workout_calories(request):
+    """가장 최근에 기록한 운동량 한 건을 되돌린다."""
+    if getattr(request, "usim_guest", False):
+        return JsonResponse({"error": "게스트 모드에서는 기록을 되돌릴 수 없습니다."}, status=403)
+    progress = WorkoutProgress.objects.filter(member=request.usim_member).first()
+    entries = progress.entries if progress and isinstance(progress.entries, list) else []
+    if not progress or not entries:
+        return JsonResponse({"error": "되돌릴 최근 운동 기록이 없습니다."}, status=400)
+    latest = entries[0] if isinstance(entries[0], dict) else {}
+    try:
+        amount = int(latest.get("calories", 0))
+    except (TypeError, ValueError):
+        amount = 0
+    if amount <= 0:
+        return JsonResponse({"error": "최근 운동 기록의 칼로리 값을 확인할 수 없습니다."}, status=400)
+    progress.total_calories = max(0, clamp_calories(progress.total_calories) - amount)
+    progress.entries = entries[1:30]
+    progress.save(update_fields=["total_calories", "entries", "updated_at"])
+    return JsonResponse(_member_progress_payload(request.usim_member))
 
 
 @never_cache
@@ -281,7 +393,7 @@ def main_page(request):
     context["room_owner"] = member
     context["room_is_visitor"] = False
     owner_progress = getattr(member, "workout_progress", None) if member is not None else None
-    context["visitor_total_calories"] = max(0, int(owner_progress.total_calories or 0)) if owner_progress else 0
+    context["visitor_total_calories"] = clamp_calories(owner_progress.total_calories) if owner_progress else 0
     address = member.address if member is not None else "서울특별시 관악구"
     try:
         latitude = float(request.GET["latitude"]) if request.GET.get("latitude") else None
@@ -289,6 +401,8 @@ def main_page(request):
         if latitude is not None and not -90 <= latitude <= 90:
             latitude = longitude = None
         if longitude is not None and not -180 <= longitude <= 180:
+            latitude = longitude = None
+        if latitude == 0 and longitude == 0:
             latitude = longitude = None
         origin = (latitude, longitude) if latitude is not None and longitude is not None else None
         available = max(1, int(request.GET.get("available_minutes", "60")))
@@ -330,13 +444,13 @@ def friend_visitor_page(request, member_id):
         return redirect("friends")
 
     progress = getattr(visitor, "workout_progress", None)
-    total_calories = max(0, int(progress.total_calories or 0)) if progress else 0
+    total_calories = clamp_calories(progress.total_calories) if progress else 0
     context = _app_context(request, "friends")
     context.update({
         "room_owner": visitor,
         "room_is_visitor": True,
         "visitor_total_calories": total_calories,
-        "visitor_level": (total_calories // 1500) + 1,
+        "visitor_level": level_for_calories(total_calories),
     })
     try:
         latitude = float(request.GET["latitude"]) if request.GET.get("latitude") else None
@@ -344,6 +458,8 @@ def friend_visitor_page(request, member_id):
         if latitude is not None and not -90 <= latitude <= 90:
             latitude = longitude = None
         if longitude is not None and not -180 <= longitude <= 180:
+            latitude = longitude = None
+        if latitude == 0 and longitude == 0:
             latitude = longitude = None
         origin = (latitude, longitude) if latitude is not None and longitude is not None else None
         payload = make_recommendations(visitor.address, set(), 60, 20, origin)
@@ -357,7 +473,7 @@ def friend_visitor_page(request, member_id):
 
 def _friend_progress(member):
     progress = getattr(member, "workout_progress", None)
-    total = max(0, int(progress.total_calories or 0)) if progress else 0
+    total = clamp_calories(progress.total_calories) if progress else 0
     return total
 
 
@@ -416,10 +532,25 @@ def room_state_api(request, member_id=None):
     layout = body.get("layout") if isinstance(body.get("layout"), dict) else {}
     # Character skins and special furniture are level rewards. Validate the
     # saved JSON on the server too, so a client cannot equip a locked asset.
-    skin_levels = {"default": 1, "hanbokFemale": 5, "hanbokMale": 5, "hanbokFemale2": 5, "hanbokMale2": 5, "rockMale": 20, "rockFemale": 20, "highendMale": 50, "highendFemale": 50}
+    skin_levels = {
+        "default": 1,
+        "hanbokFemale": 5,
+        "hanbokMale": 5,
+        "hanbokFemale2": 5,
+        "hanbokMale2": 5,
+        "hanbokRedFemale": 1,
+        "hanbokOrangeMale": 1,
+        "hanbokBlackMale": 1,
+        "hanbokBlackFemale": 1,
+        "hanbokPinkFemale": 1,
+        "rockMale": 20,
+        "rockFemale": 20,
+        "highendMale": 50,
+        "highendFemale": 50,
+    }
     requested_skin = state.get("characterSkin", "default")
     progress = WorkoutProgress.objects.filter(member=owner).first()
-    current_level = ((int(progress.total_calories or 0) // 1500) + 1) if progress else 1
+    current_level = level_for_calories(progress.total_calories) if progress else 1
     if requested_skin not in skin_levels or current_level < skin_levels[requested_skin]:
         requested_skin = "default"
     state["characterSkin"] = requested_skin
@@ -432,6 +563,29 @@ def room_state_api(request, member_id=None):
     owner.room_layout = layout
     owner.save(update_fields=["room_state", "room_layout", "updated_at"])
     return JsonResponse({"saved": True, "state": state, "layout": layout})
+
+
+@never_cache
+@member_required
+@require_http_methods(["GET", "POST"])
+def dragon_character_api(request):
+    """챗봇과 프로필이 함께 사용하는 우심이 성장/선택 상태 API."""
+    member = request.usim_member
+    if request.method == "GET":
+        return JsonResponse(character_payload(member))
+    if getattr(request, "usim_guest", False):
+        return JsonResponse({"error": "게스트 모드에서는 우심이를 변경할 수 없습니다."}, status=403)
+
+    body = _json_body(request)
+    design = body.get("design")
+    level = dragon_level(member)
+    if design not in DRAGON_DESIGNS:
+        return JsonResponse({"error": "선택할 수 없는 우심이입니다."}, status=400)
+    if level < 40:
+        return JsonResponse({"error": "레벨 40부터 우심이 디자인을 선택할 수 있습니다."}, status=403)
+    member.selected_dragon_design = design
+    member.save(update_fields=["selected_dragon_design", "updated_at"])
+    return JsonResponse({"saved": True, **character_payload(member)})
 
 
 @never_cache

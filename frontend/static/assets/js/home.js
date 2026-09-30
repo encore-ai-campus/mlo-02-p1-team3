@@ -15,7 +15,7 @@
   const pageParams = new URLSearchParams(window.location.search);
   const pageLatitude = Number(pageParams.get("latitude"));
   const pageLongitude = Number(pageParams.get("longitude"));
-  if (Number.isFinite(pageLatitude) && Number.isFinite(pageLongitude)) {
+  if (Number.isFinite(pageLatitude) && Number.isFinite(pageLongitude) && !(pageLatitude === 0 && pageLongitude === 0)) {
     window.__usimunkkaCurrentLocation = { latitude: pageLatitude, longitude: pageLongitude };
   }
   let initialRecommendations = [];
@@ -34,8 +34,8 @@
   const transportLabel = app.TRANSPORT_META[profile.transport] || profile.transport;
 
   const accountStorageKey = roomOwnerId || "guest";
-  const ROOM_STATE_KEY = `usimunkka.v1.room.state.${accountStorageKey}.v91`;
-  const LAYOUT_KEY = `usimunkka.v1.room.layout.${accountStorageKey}.v91`;
+  const ROOM_STATE_KEY = `usimunkka.v1.room.state.${accountStorageKey}.v93`;
+  const LAYOUT_KEY = `usimunkka.v1.room.layout.${accountStorageKey}.v93`;
   const defaultVisible = {
     window: true,
     poster: true,
@@ -58,26 +58,31 @@
     specialSofa: false,
     specialRug: false,
     specialLamp: false,
+    finalLamp: true,
+    finalAmp: true,
+    finalBookshelf: true,
+    finalCabinet: true,
+    finalScroll: true,
+    finalSideTable: true,
+    finalSofa: true,
+    finalRecord: true,
+    finalRug: true,
   };
   const defaultState = { tone: "cream", characterSkin: "default", visible: { ...defaultVisible } };
-  const ROOM_REWARDS = [
-    { key: "bottle", calories: 100, label: "운동 물병" },
-    { key: "towel", calories: 250, label: "스포츠 타월" },
-    { key: "dumbbell", calories: 450, label: "덤벨" },
-    { key: "gymbag", calories: 700, label: "운동 가방" },
-    { key: "shoes", calories: 1000, label: "러닝화" },
-    { key: "medal", calories: 1500, label: "기념 메달" },
-  ];
-  const ROOM_LEVEL_KCAL = 1500;
+  const ROOM_REWARDS = [];
+  const MAX_TOTAL_CALORIES = 600000;
+  const MAX_ROOM_LEVEL = 100;
+  const BASE_LEVEL_EXP = 100;
+  const LEVEL_EXPONENT = 1.6;
+  const rawLevelTotal = Array.from({ length: MAX_ROOM_LEVEL - 1 }, (_, index) => BASE_LEVEL_EXP * Math.pow(index + 1, LEVEL_EXPONENT)).reduce((sum, value) => sum + value, 0);
+  const levelCount = MAX_ROOM_LEVEL - 1;
+  const curveScale = (MAX_TOTAL_CALORIES - BASE_LEVEL_EXP * levelCount) / (rawLevelTotal - BASE_LEVEL_EXP * levelCount);
+  const levelCosts = Array.from({ length: MAX_ROOM_LEVEL - 1 }, (_, index) => Math.max(index === 0 ? BASE_LEVEL_EXP : 1, Math.round(BASE_LEVEL_EXP + (BASE_LEVEL_EXP * Math.pow(index + 1, LEVEL_EXPONENT) - BASE_LEVEL_EXP) * curveScale)));
+  levelCosts[levelCosts.length - 1] += MAX_TOTAL_CALORIES - levelCosts.reduce((sum, value) => sum + value, 0);
+  const levelStarts = [0];
+  levelCosts.forEach(cost => levelStarts.push(levelStarts.at(-1) + cost));
   const ROOM_LEVEL_TITLES = ["STARTER", "MOVER", "PACE MAKER", "ATHLETE", "ROOM MAKER", "MOVE MASTER"];
-  const SPECIAL_ITEMS = [
-    { key: "specialShelf", label: "빈티지 책장", level: 20 },
-    { key: "specialTurntable", label: "턴테이블", level: 20 },
-    { key: "specialAmp", label: "기타 앰프", level: 20 },
-    { key: "specialSofa", label: "소파", level: 20 },
-    { key: "specialRug", label: "패턴 러그", level: 20 },
-    { key: "specialLamp", label: "빈티지 조명", level: 20 },
-  ];
+  const SPECIAL_ITEMS = [];
   const CHARACTER_SKINS = {
     default: { level: 1, src: null, label: "기본 캐릭터" },
     rockMale: { level: 20, src: "/static/assets/images/room/special/rock-male.png", label: "ROCK MALE" },
@@ -88,16 +93,25 @@
     hanbokMale: { level: 5, src: "/static/assets/images/room/special/hanbok-male.png", label: "HANBOK MALE" },
     hanbokFemale2: { level: 5, src: "/static/assets/images/room/special/hanbok-female-2.png", label: "HANBOK FEMALE 2" },
     hanbokMale2: { level: 5, src: "/static/assets/images/room/special/hanbok-male-2.png", label: "HANBOK MALE 2" },
+    hanbokRedFemale: { level: 1, src: "/static/assets/images/room/special/hanbok-red-female.png", label: "꽃무늬 한복 여성" },
+    hanbokOrangeMale: { level: 1, src: "/static/assets/images/room/special/hanbok-orange-male.png", label: "주황 한복 남성" },
+    hanbokBlackMale: { level: 1, src: "/static/assets/images/room/special/hanbok-black-male.png", label: "검정 한복 남성" },
+    hanbokBlackFemale: { level: 1, src: "/static/assets/images/room/special/hanbok-black-female.png", label: "검정 한복 여성" },
+    hanbokPinkFemale: { level: 1, src: "/static/assets/images/room/special/hanbok-pink-female.png", label: "분홍 한복 여성" },
   };
 
   const getRoomLevelInfo = rawTotal => {
     const total = Math.max(0, Math.floor(Number(rawTotal) || 0));
-    const level = Math.floor(total / ROOM_LEVEL_KCAL) + 1;
-    const exp = total % ROOM_LEVEL_KCAL;
-    const percent = Math.max(0, Math.min(100, (exp / ROOM_LEVEL_KCAL) * 100));
-    const remaining = ROOM_LEVEL_KCAL - exp;
+    const levelTotal = Math.min(MAX_TOTAL_CALORIES, total);
+    let level = 1;
+    while (level < MAX_ROOM_LEVEL && levelTotal >= levelStarts[level]) level += 1;
+    if (level >= MAX_ROOM_LEVEL) return { total, level: MAX_ROOM_LEVEL, exp: total - MAX_TOTAL_CALORIES, nextExp: 0, percent: 100, remaining: 0, title: ROOM_LEVEL_TITLES.at(-1) };
+    const nextExp = levelCosts[level - 1];
+    const exp = total - levelStarts[level - 1];
+    const percent = Math.max(0, Math.min(100, (exp / nextExp) * 100));
+    const remaining = nextExp - exp;
     const title = ROOM_LEVEL_TITLES[Math.min(level - 1, ROOM_LEVEL_TITLES.length - 1)];
-    return { total, level, exp, percent, remaining, title };
+    return { total, level, exp, nextExp, percent, remaining, title };
   };
 
   const safeJson = (key, fallback) => {
@@ -159,7 +173,9 @@
     document.querySelectorAll("[data-room-item]").forEach(item => {
       const key = item.dataset.roomItem;
       const unlocked = isUnlocked(key);
-      const visible = unlocked && state.visible[key] !== false;
+      // 캐릭터는 방의 기본 구성 요소이므로 예전 계정 상태에 false가
+      // 저장되어 있어도 항상 표시한다. (구버전 커스터마이저 복구 대응)
+      const visible = key === "character" ? true : unlocked && state.visible[key] !== false;
       item.classList.toggle("is-room-hidden", !visible);
       item.classList.toggle("is-room-locked", !unlocked);
     });
@@ -431,8 +447,12 @@
     set("#roomTotalCalories", `${total.toLocaleString("ko-KR")} kcal TOTAL`);
     set("#roomLevelBadge", `LV. ${levelInfo.level}`);
     set("#roomLevelTitle", levelInfo.title);
-    set("#roomLevelExp", `${levelInfo.exp.toLocaleString("ko-KR")} / ${ROOM_LEVEL_KCAL.toLocaleString("ko-KR")} MOVE EXP`);
-    set("#roomNextLevel", `다음 레벨까지 ${levelInfo.remaining.toLocaleString("ko-KR")} kcal`);
+    set("#roomLevelExp", levelInfo.level >= MAX_ROOM_LEVEL
+      ? `MAX LEVEL · +${levelInfo.exp.toLocaleString("ko-KR")} MOVE EXP`
+      : `${levelInfo.exp.toLocaleString("ko-KR")} / ${levelInfo.nextExp.toLocaleString("ko-KR")} MOVE EXP`);
+    set("#roomNextLevel", levelInfo.level >= MAX_ROOM_LEVEL
+      ? "최대 레벨에 도달했어요"
+      : `다음 레벨까지 ${levelInfo.remaining.toLocaleString("ko-KR")} kcal`);
     set("#roomLevelPercent", `${Math.floor(levelInfo.percent)}%`);
 
     const bar = $("#roomProgressBar");
@@ -443,7 +463,7 @@
     } else if (nextReward) {
       set("#roomUnlockMessage", `다음 소품 · ${nextReward.label} — ${Math.max(0, nextReward.calories - total).toLocaleString("ko-KR")} kcal 남았어요.`);
     } else {
-      set("#roomUnlockMessage", `MOVE REWARD 전부 해금 완료 · ROOM LV.${levelInfo.level} 성장 중!`);
+      set("#roomUnlockMessage", `새 방 소품은 모두 자유롭게 배치할 수 있어요 · ROOM LV.${levelInfo.level} 성장 중!`);
     }
 
     syncCustomizer();
@@ -520,7 +540,52 @@
     if (input) input.value = "";
   });
 
+  $("#resetProgressButton")?.addEventListener("click", async () => {
+    if (!canEdit) return;
+    if (!window.confirm("누적 칼로리와 운동 기록을 모두 지우고 LV.1로 초기화할까요?")) return;
+    try {
+      const response = await fetch("/api/workout-calories/reset/", {
+        method: "POST",
+        credentials: "same-origin",
+        headers: { "Content-Type": "application/json", "X-CSRFToken": csrfToken, Accept: "application/json" },
+      });
+      const payload = await response.json();
+      if (!response.ok) throw new Error(payload.error || "레벨 초기화에 실패했습니다.");
+      serverProgress = payload;
+      savedState.characterSkin = "default";
+      draftState.characterSkin = "default";
+      localStorage.removeItem(ROOM_STATE_KEY);
+      renderWorkoutProgress("운동량을 초기화했어요 · LV.1부터 다시 시작합니다.");
+      set("#workoutCaloriesInput", "");
+    } catch (error) {
+      set("#roomUnlockMessage", error.message);
+    }
+  });
+
+  $("#undoWorkoutButton")?.addEventListener("click", async () => {
+    if (!canEdit) return;
+    if (!window.confirm("가장 최근 운동 기록을 되돌릴까요? 해당 칼로리만 차감됩니다.")) return;
+    try {
+      const response = await fetch("/api/workout-calories/undo/", {
+        method: "POST",
+        credentials: "same-origin",
+        headers: { "Content-Type": "application/json", "X-CSRFToken": csrfToken, Accept: "application/json" },
+      });
+      const payload = await response.json();
+      if (!response.ok) throw new Error(payload.error || "최근 기록을 되돌리지 못했습니다.");
+      serverProgress = payload;
+      renderWorkoutProgress("최근 운동 기록을 되돌렸어요.");
+    } catch (error) {
+      set("#roomUnlockMessage", error.message);
+    }
+  });
+
   const sportBadge = sport => ({ running: "RUN", cycling: "RIDE", crossfit: "CF", fitness: "GYM" }[sport] || "MOVE");
+  const scoreNumber = row => Number.isFinite(Number(row?.score)) ? Number(row.score) : -1;
+  const recommendationOrder = rows => [...(rows || [])].sort((a, b) => (
+    scoreNumber(b) - scoreNumber(a)
+    || (Number(a.distance_km ?? Number.POSITIVE_INFINITY) - Number(b.distance_km ?? Number.POSITIVE_INFINITY))
+  ));
   let locationPromise;
   const requestCurrentLocation = () => {
     if (locationPromise) return locationPromise;
@@ -544,25 +609,14 @@
     }
     // 위치 확인을 기다리지 않고 로그인 지역 추천을 먼저 표시한다.
     // GPS가 확인되면 아래 백그라운드 요청이 현재 위치 기준 결과로 교체한다.
-    const locationTask = serverLocationLoaded ? Promise.resolve(null) : requestCurrentLocation();
-    const currentLocation = window.__usimunkkaCurrentLocation || null;
+    const currentLocation = null;
     const region = memberAddress || `${profile.province || ""} ${profile.district || ""}`.trim();
     const parts = region.split(/\s+/).filter(Boolean);
     const aliases = { 수원: ["경기도", "수원시"], 수원시: ["경기도", "수원시"] };
     const normalized = aliases[parts.join(" ")] || aliases[parts.at(-1)] || [parts[0], parts.at(-1)];
     const selectedSport = profile.preferred_sports?.[0] || "fitness";
     let result;
-    const initialItem = initialRecommendations.find(item => item.sport === (selectedSport === "헬스" ? "fitness" : selectedSport)) || initialRecommendations[0];
-    if (initialItem) {
-      result = {
-        ...initialItem,
-        sport: initialItem.sport || selectedSport,
-        name: initialItem.name || initialItem.facility_name,
-        travel_minutes: initialItem.travel_time,
-        indoor: initialItem.indoor,
-        reasons: initialItem.reasons || [],
-      };
-    } else try {
+    try {
       const params = new URLSearchParams({
         province: normalized[0] || "",
         district: normalized[1] || "",
@@ -578,7 +632,7 @@
       const response = await fetch(`/nearby-facilities-data/?${params}`, { credentials: "same-origin", headers: { Accept: "application/json" } });
       const data = await response.json();
       if (!response.ok || !data.recommendations?.length) throw new Error("지역·운동 조건에 맞는 시설 없음");
-      const item = data.recommendations[0];
+      const item = recommendationOrder(data.recommendations)[0];
       result = {
         ...item,
         sport: item.sport || selectedSport,
@@ -596,12 +650,6 @@
       set("#spotlightMeta", `${sportLabel(selectedSport)} · ${profile.transport || "도보"} · 지역 일치 시설만 표시`);
       const tags = $("#spotlightTags");
       if (tags) tags.innerHTML = "<span>다시 추천을 눌러 재시도하세요</span>";
-      if (!currentLocation) {
-        locationTask.then(location => {
-          if (!location || window.__usimunkkaCurrentLocation) return;
-          window.location.href = `${document.body.dataset.homeUrl || "/main/"}?latitude=${encodeURIComponent(location.latitude)}&longitude=${encodeURIComponent(location.longitude)}`;
-        });
-      }
       return;
     }
     set("#spotlightIcon", sportBadge(result.sport));
@@ -615,12 +663,6 @@
       tags.innerHTML = visibleReasons.map(reason => `<span>${reason}</span>`).join("");
     }
 
-    if (!currentLocation) {
-      locationTask.then(location => {
-        if (!location || window.__usimunkkaCurrentLocation) return;
-        window.location.href = `${document.body.dataset.homeUrl || "/main/"}?latitude=${encodeURIComponent(location.latitude)}&longitude=${encodeURIComponent(location.longitude)}`;
-      });
-    }
   };
 
   const renderTalks = rows => {
@@ -649,17 +691,11 @@
 
   const reloadRecommendation = async () => {
     const minutes = Number($("#quickMinutes")?.value || 60);
-    let location = window.__usimunkkaCurrentLocation || null;
-    if (!location) location = await requestCurrentLocation();
     const params = new URLSearchParams({
       available_minutes: String(minutes),
       max_travel_minutes: String(profile.max_travel_minutes || 20),
       refresh: String(Date.now()),
     });
-    if (location) {
-      params.set("latitude", String(location.latitude));
-      params.set("longitude", String(location.longitude));
-    }
     window.location.href = `${document.body.dataset.homeUrl || "/main/"}?${params}`;
   };
 

@@ -32,6 +32,7 @@
       <div class="room-floor-flat" aria-hidden="true"></div>
       <div class="room-baseboard" aria-hidden="true"></div>
 
+      <div class="legacy-room-items" aria-hidden="true">
       <div class="room-item room-window-flat" data-room-item="window" data-default-x="23" data-default-y="28" data-min-y="15" data-max-y="45" tabindex="0" role="button" aria-label="창문. 드래그하거나 방향키로 이동">
         <i></i><i></i><span>SEOUL · 15:24</span>
       </div>
@@ -87,6 +88,8 @@
         <img src="{% static 'assets/images/room/special/lamp.png' %}" alt="빈티지 조명">
       </div>
 
+      </div>
+
       <div class="room-item character-piece" id="roomCharacter" data-room-item="character" data-default-x="52" data-default-y="61" data-min-y="39" data-max-y="82" tabindex="0" role="button" aria-label="캐릭터. 드래그하거나 방향키로 이동">
         <img
           id="roomCharacterImage"
@@ -98,6 +101,8 @@
         >
         <span class="character-bubble">오늘도<br>움직일까? :)</span>
       </div>
+
+      <div class="legacy-room-items" aria-hidden="true">
 
       <div class="room-item sport-prop prop-bottle is-room-hidden" data-room-item="bottle" data-unlock-calories="100" data-default-x="73" data-default-y="77" data-min-y="60" data-max-y="89" tabindex="0" role="button" aria-label="운동 물병. 드래그하거나 방향키로 이동">
         <i></i><b>U</b>
@@ -119,6 +124,35 @@
 
       <div class="room-item sport-prop prop-medal is-room-hidden" data-room-item="medal" data-unlock-calories="1500" data-default-x="64" data-default-y="31" data-min-y="16" data-max-y="48" tabindex="0" role="button" aria-label="메달. 드래그하거나 방향키로 이동">
         <i></i><b>U</b>
+      </div>
+      </div>
+
+      <div class="room-item final-room-item final-room-lamp" data-room-item="finalLamp" data-default-x="12" data-default-y="58" data-min-x="5" data-max-x="95" data-min-y="24" data-max-y="88" tabindex="0" role="button" aria-label="새 플로어 램프. 드래그하거나 방향키로 이동">
+        <img src="{% static 'assets/images/room/final/01_floor_lamp.png' %}" alt="플로어 램프">
+      </div>
+      <div class="room-item final-room-item final-room-amp" data-room-item="finalAmp" data-default-x="27" data-default-y="70" data-min-x="5" data-max-x="95" data-min-y="25" data-max-y="90" tabindex="0" role="button" aria-label="앰프. 드래그하거나 방향키로 이동">
+        <img src="{% static 'assets/images/room/final/02_amp.png' %}" alt="앰프">
+      </div>
+      <div class="room-item final-room-item final-room-bookshelf" data-room-item="finalBookshelf" data-default-x="74" data-default-y="45" data-min-x="5" data-max-x="95" data-min-y="20" data-max-y="82" tabindex="0" role="button" aria-label="책장. 드래그하거나 방향키로 이동">
+        <img src="{% static 'assets/images/room/final/03_bookshelf.png' %}" alt="책장">
+      </div>
+      <div class="room-item final-room-item final-room-cabinet" data-room-item="finalCabinet" data-default-x="88" data-default-y="67" data-min-x="5" data-max-x="95" data-min-y="25" data-max-y="90" tabindex="0" role="button" aria-label="수납장. 드래그하거나 방향키로 이동">
+        <img src="{% static 'assets/images/room/final/04_cabinet.png' %}" alt="수납장">
+      </div>
+      <div class="room-item final-room-item final-room-scroll" data-room-item="finalScroll" data-default-x="49" data-default-y="27" data-min-x="5" data-max-x="95" data-min-y="12" data-max-y="58" tabindex="0" role="button" aria-label="벽 족자. 드래그하거나 방향키로 이동">
+        <img src="{% static 'assets/images/room/final/05_wall_scroll.png' %}" alt="벽 족자">
+      </div>
+      <div class="room-item final-room-item final-room-side-table" data-room-item="finalSideTable" data-default-x="47" data-default-y="68" data-min-x="5" data-max-x="95" data-min-y="25" data-max-y="90" tabindex="0" role="button" aria-label="협탁. 드래그하거나 방향키로 이동">
+        <img src="{% static 'assets/images/room/final/06_side_table_cluster.png' %}" alt="협탁과 소품">
+      </div>
+      <div class="room-item final-room-item final-room-sofa" data-room-item="finalSofa" data-default-x="52" data-default-y="72" data-min-x="5" data-max-x="95" data-min-y="35" data-max-y="91" tabindex="0" role="button" aria-label="소파. 드래그하거나 방향키로 이동">
+        <img src="{% static 'assets/images/room/final/07_sofa.png' %}" alt="소파">
+      </div>
+      <div class="room-item final-room-item final-room-record" data-room-item="finalRecord" data-default-x="68" data-default-y="77" data-min-x="5" data-max-x="95" data-min-y="35" data-max-y="92" tabindex="0" role="button" aria-label="레코드 플레이어 테이블. 드래그하거나 방향키로 이동">
+        <img src="{% static 'assets/images/room/final/08_record_player_table.png' %}" alt="레코드 플레이어 테이블">
+      </div>
+      <div class="room-item final-room-item final-room-rug" data-room-item="finalRug" data-default-x="50" data-default-y="87" data-min-x="5" data-max-x="95" data-min-y="60" data-max-y="96" tabindex="0" role="button" aria-label="꽃무늬 러그. 드래그하거나 방향키로 이동">
+        <img src="{% static 'assets/images/room/final/rug.png' %}" alt="꽃무늬 러그">
       </div>
 
       <div class="room-drag-help" aria-hidden="true">DRAG & DROP · 위치 자동 저장</div>
@@ -174,7 +208,7 @@
     <div class="workout-log-copy">
       <span>03 / MOVE LOG</span>
       <h2>움직인 만큼, 우심이의 방도 자라요</h2>
-      <p>운동량에는 상한이 없어요. 1,500 kcal마다 ROOM LEVEL이 올라가고, 처음 1,500 kcal까지는 꾸미기 소품도 차례로 열려요.</p>
+      <p>운동 칼로리를 쌓으면 ROOM LEVEL이 올라가요. 레벨업 필요량은 점점 늘어나며, 최대 600,000 kcal에서 LV.100에 도달합니다.</p>
     </div>
     <form class="workout-log-form" id="workoutLogForm">
       <label for="workoutCaloriesInput">
@@ -188,16 +222,20 @@
         <span>MY ROOM GROWTH</span>
         <strong id="roomTotalCalories">0 kcal</strong>
       </div>
+      <div class="room-progress-actions">
+        <button type="button" class="workout-undo-button" id="undoWorkoutButton">최근 기록 되돌리기</button>
+        <button type="button" class="room-reset-progress-button" id="resetProgressButton">레벨 초기화</button>
+      </div>
       <div class="room-level-row">
         <span class="room-level-badge" id="roomLevelBadge">LV. 1</span>
         <div class="room-level-copy">
           <strong id="roomLevelTitle">STARTER</strong>
-          <small id="roomLevelExp">0 / 1,500 MOVE EXP</small>
+          <small id="roomLevelExp">0 / 100 MOVE EXP</small>
         </div>
       </div>
       <div class="room-progress-track" aria-label="현재 레벨 진행도"><i id="roomProgressBar"></i></div>
-      <div class="room-progress-foot"><span id="roomNextLevel">다음 레벨까지 1,500 kcal</span><b id="roomLevelPercent">0%</b></div>
-      <p id="roomUnlockMessage">100 kcal를 채우면 첫 소품이 열려요.</p>
+      <div class="room-progress-foot"><span id="roomNextLevel">다음 레벨까지 100 kcal</span><b id="roomLevelPercent">0%</b></div>
+      <p id="roomUnlockMessage">새 방 소품은 모두 열려 있어요. 원하는 위치에 자유롭게 배치해보세요.</p>
     </div>
   </section>
 
@@ -231,6 +269,23 @@
           </div>
         </fieldset>
 
+        <fieldset class="final-room-customizer-fieldset">
+          <legend>NEW ROOM ITEMS · 자유 배치</legend>
+          <p class="final-room-customizer-help">모든 새 소품이 기본으로 열려 있어요. 방 안에서 드래그하거나 아래 버튼으로 표시 여부를 바꿀 수 있어요.</p>
+          <div class="item-toggle-grid final-room-item-grid">
+            <button type="button" data-toggle-item="finalLamp" class="is-selected"><span>01</span><b>플로어 램프</b></button>
+            <button type="button" data-toggle-item="finalAmp" class="is-selected"><span>02</span><b>앰프</b></button>
+            <button type="button" data-toggle-item="finalBookshelf" class="is-selected"><span>03</span><b>책장</b></button>
+            <button type="button" data-toggle-item="finalCabinet" class="is-selected"><span>04</span><b>수납장</b></button>
+            <button type="button" data-toggle-item="finalScroll" class="is-selected"><span>05</span><b>벽 족자</b></button>
+            <button type="button" data-toggle-item="finalSideTable" class="is-selected"><span>06</span><b>협탁</b></button>
+            <button type="button" data-toggle-item="finalSofa" class="is-selected"><span>07</span><b>소파</b></button>
+            <button type="button" data-toggle-item="finalRecord" class="is-selected"><span>08</span><b>레코드 테이블</b></button>
+            <button type="button" data-toggle-item="finalRug" class="is-selected"><span>09</span><b>꽃무늬 러그</b></button>
+          </div>
+        </fieldset>
+
+        <div class="legacy-customizer-options" hidden>
         <fieldset>
           <legend>ROOM ITEMS</legend>
           <div class="item-toggle-grid">
@@ -242,8 +297,9 @@
             <button type="button" data-toggle-item="lamp" class="is-selected"><span class="room-button-thumb thumb-lamp" aria-hidden="true"></span><span>LAMP</span><b>조명</b></button>
           </div>
         </fieldset>
+        </div>
 
-        <fieldset>
+        <fieldset class="legacy-customizer-fieldset" hidden>
           <legend>MOVE REWARDS · 누적 운동량으로 해금</legend>
           <div class="item-toggle-grid sport-item-grid">
             <button type="button" data-toggle-item="bottle" data-unlock-calories="100"><span>100 KCAL</span><b>운동 물병</b><small>LOCKED</small></button>
@@ -267,10 +323,15 @@
             <button type="button" data-character-skin="hanbokMale" data-unlock-level="5"><img src="{% static 'assets/images/room/special/hanbok-male.png' %}" alt="한복 캐릭터 남성"><b>HANBOK MALE</b><small>LV. 5</small></button>
             <button type="button" data-character-skin="hanbokFemale2" data-unlock-level="5"><img src="{% static 'assets/images/room/special/hanbok-female-2.png' %}" alt="한복 캐릭터 여성 2"><b>HANBOK FEMALE 2</b><small>LV. 5</small></button>
             <button type="button" data-character-skin="hanbokMale2" data-unlock-level="5"><img src="{% static 'assets/images/room/special/hanbok-male-2.png' %}" alt="한복 캐릭터 남성 2"><b>HANBOK MALE 2</b><small>LV. 5</small></button>
+            <button type="button" data-character-skin="hanbokRedFemale" data-unlock-level="1"><img src="{% static 'assets/images/room/special/hanbok-red-female.png' %}" alt="꽃무늬 한복 여성"><b>꽃무늬 한복 여성</b><small>LV. 1</small></button>
+            <button type="button" data-character-skin="hanbokOrangeMale" data-unlock-level="1"><img src="{% static 'assets/images/room/special/hanbok-orange-male.png' %}" alt="주황 한복 남성"><b>주황 한복 남성</b><small>LV. 1</small></button>
+            <button type="button" data-character-skin="hanbokBlackMale" data-unlock-level="1"><img src="{% static 'assets/images/room/special/hanbok-black-male.png' %}" alt="검정 한복 남성"><b>검정 한복 남성</b><small>LV. 1</small></button>
+            <button type="button" data-character-skin="hanbokBlackFemale" data-unlock-level="1"><img src="{% static 'assets/images/room/special/hanbok-black-female.png' %}" alt="검정 한복 여성"><b>검정 한복 여성</b><small>LV. 1</small></button>
+            <button type="button" data-character-skin="hanbokPinkFemale" data-unlock-level="1"><img src="{% static 'assets/images/room/special/hanbok-pink-female.png' %}" alt="분홍 한복 여성"><b>분홍 한복 여성</b><small>LV. 1</small></button>
           </div>
         </fieldset>
 
-        <fieldset>
+        <fieldset class="legacy-customizer-fieldset" hidden>
           <legend>SPECIAL ROOM ITEMS · LV. 20 UNLOCK</legend>
           <div class="special-item-grid">
             <button type="button" data-special-item="specialShelf" data-unlock-level="20"><img src="{% static 'assets/images/room/special/bookcase.png' %}" alt="빈티지 책장"><b>빈티지 책장</b><small>LOCKED</small></button>
@@ -294,5 +355,5 @@
 {% endblock %}
 {% block extra_js %}
 {{ initial_recommendations|json_script:"initialRecommendations" }}
-<script src="{% static 'assets/js/home.js' %}?v=20260923-1730"></script>
+<script src="{% static 'assets/js/home.js' %}?v=20260929-1730"></script>
 {% endblock %}

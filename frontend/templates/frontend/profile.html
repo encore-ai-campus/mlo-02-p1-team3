@@ -78,9 +78,12 @@
                 <strong>오늘의 나를 한 장면으로</strong>
                 <small>이모지 대신 캐릭터의 자세와 색감으로 지금 상태를 골라요.</small>
               </div>
-              <div class="mood-preview vibe-preview">
+              <div class="profile-dragon-action-wrap">
+                <button type="button" class="dragon-picker-open" id="dragonPickerOpen">우심이 변경</button>
+                <div class="mood-preview vibe-preview">
                 <span id="moodPreviewCode">READY</span>
                 <b id="moodPreviewLabel">가볍게 시작</b>
+                </div>
               </div>
             </div>
 
@@ -386,6 +389,19 @@
       </button>
     </div>
   </form>
+</div>
+
+<div class="dragon-picker-modal" id="dragonPickerModal" hidden>
+  <div class="dragon-picker-backdrop" data-dragon-close></div>
+  <section class="dragon-picker-dialog" role="dialog" aria-modal="true" aria-labelledby="dragonPickerTitle">
+    <button type="button" class="dragon-picker-close" data-dragon-close aria-label="우심이 변경 닫기">×</button>
+    <p class="section-kicker">MY MOVE CHARACTER</p>
+    <h2 id="dragonPickerTitle">우심이를 골라주세요</h2>
+    <p class="dragon-picker-help" id="dragonPickerHelp">운동량에 따라 우심이가 알에서 용으로 성장해요.</p>
+    <div class="dragon-stage-strip" id="dragonStageStrip" aria-label="성장 단계"></div>
+    <div class="dragon-design-grid" id="dragonDesignGrid" aria-label="우심이 디자인 선택"></div>
+    <p class="dragon-picker-message" id="dragonPickerMessage" role="status"></p>
+  </section>
 </div>
 {% endblock %}
 {% block extra_js %}

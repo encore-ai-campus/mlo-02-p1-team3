@@ -27,6 +27,8 @@ def live_recommendations(request):
             raise ValueError("경도 범위가 올바르지 않습니다.")
         if (latitude is None) != (longitude is None):
             raise ValueError("위도와 경도를 함께 보내야 합니다.")
+        if latitude == 0 and longitude == 0:
+            latitude = longitude = None
         origin = (latitude, longitude) if latitude is not None else None
         payload = make_recommendations(region, sports, available, max_travel, origin)
     except Exception as exc:
