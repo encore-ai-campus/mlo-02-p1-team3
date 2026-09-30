@@ -225,45 +225,7 @@
 
 ### 시스템 구조 — 한 번의 추천 요청은 이렇게 흘러갑니다
 
-```mermaid
-flowchart TB
-    User["👤 사용자<br/>(브라우저)"]
-
-    subgraph Render["☁️ Render 서버"]
-        Django["⚙️ Django 백엔드<br/>회원 · 추천 · 기록 · 친구 · 챗봇"]
-    end
-
-    subgraph DB["🗄️ PostgreSQL + PostGIS"]
-        Svc["서비스 데이터<br/>회원 · 운동기록 · 친구"]
-        Raw["m3_raw<br/>수집 원본"]
-        Proc["m3_processed<br/>시설 · 날씨 · 대기질 · 안전 · 운동처방"]
-        Derived["m3_derived<br/>파생 데이터"]
-        Monitor["m3_monitoring<br/>pipeline_run_history"]
-    end
-
-    subgraph Ext["🌐 외부 서비스"]
-        Kakao["카카오 로컬<br/>주소 ↔ 좌표 · 장소검색"]
-        API["공공데이터 API<br/>기상청 · 에어코리아 · 체육시설"]
-        Culture["문화빅데이터 플랫폼"]
-        Web["시설 공개 홈페이지"]
-        OpenAI["OpenAI<br/>우심이"]
-    end
-
-    Pipe["🔄 예약 파이프라인<br/>수집 → 정제 → DQ → 적재"]
-
-    User <-->|"화면 · API 요청"| Django
-    Django <--> Svc
-    Django -->|"시설·날씨·대기질 조회"| Proc
-    Django --> Kakao
-    Django -->|"운영·휴무 확인"| Web
-    Django -->|"질문에 맞는 처방 후보 검색"| Proc
-    Django -->|"요약 근거 + 프로필·최근 기록"| OpenAI
-    API --> Pipe
-    Culture --> Pipe
-    Pipe --> Raw --> Proc
-    Proc --> Derived
-    Pipe --> Monitor
-```
+![우심운까 시스템 아키텍처](docs/images/architecture.png)
 
 ![우심운까를 만드는 기술](docs/images/tech-stack.png)
 
