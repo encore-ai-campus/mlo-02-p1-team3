@@ -1,4 +1,4 @@
-**[ 🇰🇷 한국어 (Korean) ]** | [ 🌐 English ](README_en.md) | [ 🚀 Standalone Portfolio Repo ](https://github.com/baikAnalyst/data-reliability-pipeline)
+﻿**[ 🇰🇷 한국어 (Korean) ]** | [ 🌐 English ](README_en.md) | [ 🚀 Standalone Portfolio Repo ](https://github.com/baikAnalyst/data-reliability-pipeline)
 
 ---
 
@@ -333,3 +333,4 @@ APScheduler를 활용하여 데이터 소스의 갱신 주기에 맞춘 최적�
 │   └── test_dq_profiler.py
 └── requirements.txt                 # 의존성 라이브러리 목록
 ```
+
