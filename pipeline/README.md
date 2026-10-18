@@ -1,8 +1,4 @@
-﻿**[ 🇰🇷 한국어 (Korean) ]** | [ 🌐 English ](README_en.md) | [ 🚀 Standalone Portfolio Repo ](https://github.com/baikAnalyst/data-reliability-pipeline)
-
----
-
-# 🛡️ 우심운까 Production PostgreSQL Data Reliability Pipeline & DQ Audit Engine
+﻿# 🛡️ 우심운까 Production PostgreSQL Data Reliability Pipeline & DQ Audit Engine
 
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue.svg?logo=python&logoColor=white)](https://www.python.org/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15%2B-336791.svg?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
