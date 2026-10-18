@@ -13,9 +13,7 @@
 
 > **"If data cannot be audited, it is not reliable."**  
 > An enterprise-grade Data Reliability Engineering (DRE) pipeline handling large-scale public and culture big data (**4.08M+ records**) featuring **fault-isolated ingestion, checkpoint-based recovery, 16-rule DQ auditing, row-level reconciliation, and automated bi-daily operational reporting**.  
-> 
-> 👤 **Data Engineering & Pipeline Architecture Lead**: **Sonia Baik ([@baikAnalyst](https://github.com/baikAnalyst))**  
-> 🏆 **Engineered for the 2026 KSPO Public Big Data Utilization Competition (Service Development Track)**
+> 👤 **Data Engineering & Pipeline Architecture Lead**: **Sonia Baik ([@baikAnalyst](https://github.com/baikAnalyst))**
 
 ---
 
@@ -321,5 +319,5 @@ Rather than drowning engineers in unformatted terminal dumps, the pipeline forma
 
 ## 📄 License & Attribution
 
-This project was built for production data reliability engineering and submitted to the **2026 KSPO Public Big Data Utilization Competition**.  
+This project was built for production data reliability engineering.  
 All rights reserved.
